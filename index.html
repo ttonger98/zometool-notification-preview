@@ -953,36 +953,39 @@
     .screen-content .scene { border-radius: 0; box-shadow: none; }
 
     /* Fixed target screen: 813 x 375 */
+    /* Responsive: fill the entire viewport */
     .phone-frame {
-      width: 813px;
-      height: 375px;
+      width: 100vw;
+      height: 100vh;
       border-radius: 0;
       overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .phone-screen {
-      width: 813px;
-      height: 375px;
+      width: 1180px;
+      height: 560px;
       border-radius: 0;
+      position: relative;
+      transform-origin: center center;
     }
     .screen-content {
       width: 1180px;
       height: 560px;
-      transform: scale(.689);
-      transform-origin: left top;
+      position: absolute;
+      left: 0;
+      top: 0;
     }
     .screen-content .scene {
       width: 1180px;
       height: 560px;
       border-radius: 0;
     }
-    @media (max-width: 900px) { .phone-frame { transform: scale(.96); } }
-    @media (max-width: 820px) { .phone-frame { transform: scale(.9); } }
-    @media (max-width: 1260px) { .phone-frame { transform: scale(.9); } }
-    @media (max-width: 1200px) { .phone-frame { transform: scale(.82); } }
   </style>
 </head>
 <body>
-  <div class="device-note">Zometool APP 风格｜813×375 屏幕预览</div>
+  <div class="device-note" style="display:none"></div>
   <div class="phone-frame"><div class="phone-screen"><div class="dynamic-island"></div><div class="screen-content">
   <div class="scene">
     <div class="top-title"><span class="back">↩</span><span>消息通知</span></div>
@@ -1106,6 +1109,16 @@ confirmMask.onclick = e => { if(e.target===confirmMask) closeDeleteConfirm(); };
 singleDeleteMask.onclick = e => { if(e.target===singleDeleteMask) closeSingleDeleteConfirm(); };
 previewMask.onclick = e => { if(e.target===previewMask) closePreview(); };
 render();
+
+	const DESIGN_W = 1180, DESIGN_H = 560;
+	const phoneScreen = document.querySelector('.phone-screen');
+	function resize() {
+	  const vw = window.innerWidth, vh = window.innerHeight;
+	  const scale = Math.min(vw / DESIGN_W, vh / DESIGN_H);
+	  phoneScreen.style.transform = `scale(${scale})`;
+	}
+	window.addEventListener('resize', resize);
+	resize();
 </script>
 </body>
 </html>
