@@ -2,11 +2,11 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Zometool通知" />
-  <title>Zometool 消息通知中心</title>
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <title>Zometool 消息通知中心 iPhone 17 Pro 适配预览</title>
   <style>
     :root {
       --w: 1180px;
@@ -22,18 +22,14 @@
       --blue: #45B9FF;
     }
     * { box-sizing: border-box; }
-    html, body {
+    body {
       margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      height: 100dvh;
-      overflow: hidden;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: radial-gradient(circle at 50% 10%, #dfe8f8, #aebbd0 70%);
       font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
       color: var(--ink);
-    }
-    body {
-      background: radial-gradient(circle at 50% 10%, #dfe8f8, #aebbd0 70%);
     }
     .scene {
       width: var(--w);
@@ -954,43 +950,477 @@
     .confirm-modal h3 { font-size: 20px; }
     .confirm-modal p { font-size: 15px; }
     .preview-box { width: 580px; height: 320px; }
-    /* Responsive: fill the entire viewport */
+    .device-note { display: none; }
+    .phone-frame,
+    .phone-screen,
+    .screen-content .scene { border-radius: 0; box-shadow: none; }
+
+    /* Fixed target screen: 813 x 375 */
     .phone-frame {
-      position: fixed;
-      inset: 0;
+      width: 813px;
+      height: 375px;
+      border-radius: 0;
       overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
     .phone-screen {
-      width: 1180px;
-      height: 560px;
-      position: relative;
-      overflow: hidden;
+      width: 813px;
+      height: 375px;
+      border-radius: 0;
     }
     .screen-content {
-      position: absolute;
-      inset: 0;
+      width: 1180px;
+      height: 560px;
+      transform: scale(.689);
+      transform-origin: left top;
     }
     .screen-content .scene {
       width: 1180px;
       height: 560px;
       border-radius: 0;
     }
-    .device-note { display: none; }
+
+    /* Real iPhone full-screen viewport adaptation */
+    html, body {
+      width: 100%;
+      height: 100%;
+      min-height: 100%;
+      overflow: hidden;
+      overscroll-behavior: none;
+      background: #DDF6FF;
+    }
+    body {
+      display: block;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    }
+    .phone-frame,
+    .phone-screen,
+    .screen-content {
+      width: 100vw;
+      height: 100vh;
+      border-radius: 0;
+      transform: none !important;
+      box-shadow: none;
+      overflow: hidden;
+    }
+    .phone-frame {
+      position: fixed;
+      inset: 0;
+    }
+    .screen-content {
+      position: relative;
+      left: 0;
+      top: 0;
+    }
+    .screen-content .scene,
+    .scene {
+      width: 100vw;
+      height: 100vh;
+      border-radius: 0;
+      box-shadow: none;
+    }
+    .top-title {
+      left: calc(24px + env(safe-area-inset-left));
+      top: calc(16px + env(safe-area-inset-top));
+      font-size: clamp(18px, 3.1vw, 24px);
+    }
+    .back {
+      width: clamp(34px, 5.2vw, 42px);
+      height: clamp(34px, 5.2vw, 42px);
+      font-size: clamp(22px, 3.7vw, 28px);
+    }
+    .nav {
+      left: calc(24px + env(safe-area-inset-left));
+      top: calc(78px + env(safe-area-inset-top));
+      width: clamp(118px, 18vw, 154px);
+      font-size: clamp(14px, 2.2vw, 18px);
+    }
+    .nav-item {
+      height: clamp(42px, 7.2vh, 54px);
+      margin-bottom: clamp(8px, 2vh, 14px);
+      border-radius: 16px;
+      padding: 0 clamp(12px, 2.3vw, 18px);
+    }
+    .mail-list-panel {
+      left: calc(178px + env(safe-area-inset-left));
+      top: calc(58px + env(safe-area-inset-top));
+      width: clamp(220px, 36vw, 296px);
+      height: calc(100vh - 88px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+      min-height: 270px;
+      padding: 48px 10px 58px;
+    }
+    .mail-shell {
+      left: calc(178px + env(safe-area-inset-left) + clamp(220px, 36vw, 296px) + 20px);
+      top: calc(58px + env(safe-area-inset-top));
+      right: calc(22px + env(safe-area-inset-right));
+      width: auto;
+      height: calc(100vh - 88px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+      min-height: 270px;
+      padding: 0;
+    }
+    .detail-paper {
+      padding: clamp(18px, 3.2vw, 28px);
+    }
+    .detail-title {
+      font-size: clamp(18px, 3vw, 24px);
+    }
+    .detail-time,
+    .meta-row {
+      font-size: clamp(11px, 1.8vw, 14px);
+    }
+    .mail-body {
+      font-size: clamp(14px, 2.1vw, 17px);
+      max-height: 28vh;
+    }
+    .mail-item {
+      min-height: clamp(54px, 9.2vh, 66px);
+      grid-template-columns: clamp(34px, 5.4vw, 44px) minmax(0,1fr);
+      padding: 7px 10px;
+      border-radius: 16px;
+    }
+    .mail-icon {
+      width: clamp(32px, 5vw, 38px);
+      height: clamp(32px, 5vw, 38px);
+      font-size: clamp(16px, 2.8vw, 20px);
+    }
+    .mail-text h3 { font-size: clamp(12px, 2vw, 15px); }
+    .mail-text p { font-size: clamp(10px, 1.6vw, 12px); }
+    .panel-actions { bottom: 10px; }
+    .game-btn,
+    .goto-mail,
+    .delete-mail {
+      height: clamp(32px, 5.8vh, 40px);
+      min-width: clamp(86px, 13.4vw, 108px);
+      font-size: clamp(13px, 2vw, 16px);
+    }
+    .media-block {
+      grid-template-columns: clamp(92px, 15vw, 128px) 1fr;
+      max-width: min(384px, 68vw);
+    }
+    .attach-card {
+      width: clamp(62px, 11vw, 88px);
+      height: clamp(62px, 11vw, 88px);
+      font-size: clamp(26px, 4.5vw, 36px);
+    }
+    .media-block.batch .attach-card {
+      width: clamp(48px, 8.4vw, 66px);
+      height: clamp(48px, 8.4vw, 66px);
+      font-size: clamp(20px, 3.5vw, 28px);
+    }
+    .preview-box {
+      width: min(72vw, 580px);
+      height: min(76vh, 320px);
+    }
+    .activity-banner {
+      margin-top: 14px;
+      width: min(100%, 430px);
+      min-height: 104px;
+      border-radius: 22px;
+      padding: 18px 20px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 14px;
+      color: #FFFFFF;
+      box-shadow: 0 12px 26px rgba(45,116,196,.16), inset 0 0 0 1px rgba(255,255,255,.32);
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .banner-copy { position: relative; z-index: 1; display: grid; gap: 4px; min-width: 0; }
+    .banner-label {
+      width: fit-content;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.24);
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .banner-copy b { font-size: 18px; line-height: 1.2; }
+    .banner-copy span { font-size: 13px; line-height: 1.35; opacity: .92; font-weight: 800; }
+    .banner-icon {
+      width: 66px;
+      height: 66px;
+      border-radius: 20px;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,.22);
+      font-size: 34px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.24);
+    }
+
+    @media (max-aspect-ratio: 1.45/1) {
+      .nav { display: none; }
+      .mail-list-panel {
+        left: calc(18px + env(safe-area-inset-left));
+        width: min(38vw, 300px);
+      }
+      .mail-shell {
+        left: calc(18px + env(safe-area-inset-left) + min(38vw, 300px) + 14px);
+      }
+    }
+    @media (max-width: 900px) { .phone-frame { transform: scale(.96); } }
+    @media (max-width: 820px) { .phone-frame { transform: scale(.9); } }
+    @media (max-width: 1260px) { .phone-frame { transform: scale(.9); } }
+    @media (max-width: 1200px) { .phone-frame { transform: scale(.82); } }
+
+    /* Final mobile fullscreen adaptation: must be last */
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #DDF6FF;
+    }
+    body {
+      display: block !important;
+      min-height: var(--app-height, 100dvh) !important;
+      padding: 0 !important;
+    }
+    .phone-frame,
+    .phone-screen,
+    .screen-content,
+    .scene {
+      width: 100vw !important;
+      height: var(--app-height, 100dvh) !important;
+      min-height: 0 !important;
+      max-height: none !important;
+      border-radius: 0 !important;
+      transform: none !important;
+      box-shadow: none !important;
+      position: fixed !important;
+      inset: 0 !important;
+      overflow: hidden !important;
+    }
+    .phone-screen,
+    .screen-content,
+    .scene {
+      position: absolute !important;
+    }
+    .screen-content .scene {
+      width: 100vw !important;
+      height: var(--app-height, 100dvh) !important;
+    }
+    .scene {
+      background: #DDF6FF !important;
+    }
+    .device-note { display: none !important; }
+    .top-title {
+      left: max(18px, env(safe-area-inset-left)) !important;
+      top: max(12px, env(safe-area-inset-top)) !important;
+      font-size: clamp(18px, 3.1vw, 24px) !important;
+    }
+    .nav {
+      left: max(18px, env(safe-area-inset-left)) !important;
+      top: calc(max(12px, env(safe-area-inset-top)) + 60px) !important;
+      width: clamp(112px, 17vw, 154px) !important;
+    }
+    .mail-list-panel {
+      left: calc(max(18px, env(safe-area-inset-left)) + clamp(128px, 19vw, 170px)) !important;
+      top: calc(max(12px, env(safe-area-inset-top)) + 48px) !important;
+      width: clamp(218px, 35vw, 296px) !important;
+      height: calc(var(--app-height, 100dvh) - max(12px, env(safe-area-inset-top)) - max(10px, env(safe-area-inset-bottom)) - 62px) !important;
+      min-height: 0 !important;
+    }
+    .mail-shell {
+      left: calc(max(18px, env(safe-area-inset-left)) + clamp(128px, 19vw, 170px) + clamp(218px, 35vw, 296px) + 18px) !important;
+      right: max(18px, env(safe-area-inset-right)) !important;
+      top: calc(max(12px, env(safe-area-inset-top)) + 48px) !important;
+      width: auto !important;
+      height: calc(var(--app-height, 100dvh) - max(12px, env(safe-area-inset-top)) - max(10px, env(safe-area-inset-bottom)) - 62px) !important;
+      min-height: 0 !important;
+    }
+    @media (max-width: 760px) {
+      .nav { display: none !important; }
+      .mail-list-panel {
+        left: max(14px, env(safe-area-inset-left)) !important;
+        width: 35vw !important;
+      }
+      .mail-shell {
+        left: calc(max(14px, env(safe-area-inset-left)) + 35vw + 12px) !important;
+        right: max(14px, env(safe-area-inset-right)) !important;
+      }
+    }
+
+
+    @media (max-width: 850px) and (max-height: 430px) {
+      .top-title { top: 10px !important; font-size: 19px !important; }
+      .back { width: 34px !important; height: 34px !important; font-size: 22px !important; }
+      .nav { top: 62px !important; width: 112px !important; font-size: 14px !important; }
+      .nav-item { height: 38px !important; margin-bottom: 8px !important; padding: 0 12px !important; border-radius: 14px !important; }
+      .mail-list-panel {
+        left: 144px !important;
+        top: 44px !important;
+        width: 255px !important;
+        height: calc(var(--app-height, 100dvh) - 54px) !important;
+        padding: 42px 9px 48px !important;
+        border-radius: 22px !important;
+      }
+      .mail-shell {
+        left: 412px !important;
+        right: 12px !important;
+        top: 44px !important;
+        height: calc(var(--app-height, 100dvh) - 54px) !important;
+        border-radius: 22px !important;
+      }
+      .list-title { top: 14px !important; left: 16px !important; font-size: 17px !important; }
+      .count-pill { top: 13px !important; right: 13px !important; height: 24px !important; padding: 0 9px !important; font-size: 11px !important; }
+      .mail-list { gap: 8px !important; }
+      .mail-item { min-height: 49px !important; grid-template-columns: 32px minmax(0,1fr) !important; padding: 6px 8px !important; border-radius: 14px !important; }
+      .mail-icon { width: 31px !important; height: 31px !important; font-size: 16px !important; border-radius: 11px !important; }
+      .mail-text h3 { font-size: 12px !important; line-height: 1.15 !important; }
+      .mail-text p { font-size: 10px !important; margin-top: 2px !important; }
+      .panel-actions { left: 10px !important; right: 10px !important; bottom: 9px !important; gap: 8px !important; }
+      .game-btn { height: 31px !important; min-width: 0 !important; font-size: 12px !important; border-radius: 11px !important; }
+      .detail-paper { padding: 16px 16px 52px !important; border-radius: 22px !important; }
+      .detail-head { gap: 10px !important; padding-bottom: 9px !important; }
+      .detail-title { font-size: 18px !important; line-height: 1.22 !important; }
+      .detail-time { font-size: 11px !important; }
+      .meta-row { margin: 8px 0 7px !important; font-size: 11px !important; }
+      .mail-body { font-size: 14px !important; line-height: 1.42 !important; max-height: 60px !important; margin-top: 6px !important; }
+      .media-block { margin-top: 10px !important; grid-template-columns: 88px 1fr !important; gap: 10px !important; max-width: 330px !important; }
+      .media-block.batch { max-width: 330px !important; }
+      .attach-title { height: 23px !important; min-width: 104px !important; padding-left: 8px !important; font-size: 12px !important; margin-bottom: 7px !important; }
+      .media-copy { font-size: 12px !important; line-height: 1.3 !important; }
+      .attach-card { width: 58px !important; height: 58px !important; border-radius: 14px !important; font-size: 24px !important; }
+      .media-block.batch .attach-card { width: 48px !important; height: 48px !important; font-size: 20px !important; }
+      .attach-card span { font-size: 11px !important; }
+      .activity-banner { margin-top: 10px !important; width: 100% !important; min-height: 84px !important; padding: 12px 14px !important; border-radius: 18px !important; }
+      .banner-copy { gap: 3px !important; }
+      .banner-label { padding: 3px 8px !important; font-size: 10px !important; }
+      .banner-copy b { font-size: 15px !important; }
+      .banner-copy span { font-size: 11px !important; }
+      .banner-icon { width: 52px !important; height: 52px !important; border-radius: 16px !important; font-size: 27px !important; }
+      .detail-actions { right: 16px !important; bottom: 13px !important; gap: 8px !important; }
+      .goto-mail, .delete-mail { height: 31px !important; min-width: 82px !important; border-radius: 11px !important; font-size: 12px !important; }
+    }
+
+    /* Read/unread visual states */
+    .mail-item.unread {
+      background: #FFFFFF !important;
+      border: 2px solid rgba(67,169,244,.28) !important;
+      box-shadow: 0 10px 24px rgba(67,169,244,.14) !important;
+    }
+    .mail-item.unread::after {
+      content: "";
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #FF5967;
+    }
+    .mail-item.read {
+      background: rgba(255,255,255,.62) !important;
+      opacity: .72;
+      box-shadow: none !important;
+    }
+    .mail-item.read .mail-text h3,
+    .mail-item.read .mail-text p,
+    .mail-item.read .mail-icon {
+      opacity: .62;
+    }
+    .mail-item.active { opacity: 1; }
+    .mail-item.active .mail-text h3,
+    .mail-item.active .mail-text p,
+    .mail-item.active .mail-icon { opacity: 1; }
+
+    /* Read state should still look clickable */
+    .mail-item.read {
+      background: rgba(255,255,255,.86) !important;
+      opacity: .9 !important;
+      border: 1.5px solid rgba(126,137,151,.30) !important;
+      box-shadow: 0 6px 14px rgba(73,80,94,.05) !important;
+    }
+    .mail-item.read .mail-text h3,
+    .mail-item.read .mail-icon {
+      opacity: .82 !important;
+    }
+    .mail-item.read .mail-text p {
+      opacity: .76 !important;
+    }
+    .mail-item.read:hover {
+      border-color: rgba(126,137,151,.42) !important;
+      box-shadow: 0 8px 18px rgba(73,80,94,.08) !important;
+    }
+
+    .user-link {
+      color: #2E9BEF;
+      font-weight: 900;
+      text-decoration: none;
+      cursor: pointer;
+      border-bottom: 1px solid rgba(46,155,239,.32);
+    }
+    .user-link:active { opacity: .72; }
+
+    /* Stronger read/unread contrast */
+    .mail-item.unread {
+      background: #FFFFFF !important;
+      border: 2px solid rgba(43,157,240,.48) !important;
+      box-shadow: 0 12px 28px rgba(43,157,240,.18) !important;
+      opacity: 1 !important;
+    }
+    .mail-item.unread::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 12px;
+      bottom: 12px;
+      width: 4px;
+      border-radius: 0 999px 999px 0;
+      background: #2B9DF0;
+    }
+    .mail-item.unread .mail-text h3 {
+      color: #202833 !important;
+      font-weight: 950 !important;
+    }
+    .mail-item.unread .mail-icon {
+      background: #E9F6FF !important;
+      color: #2B9DF0 !important;
+      opacity: 1 !important;
+    }
+    .mail-item.read {
+      background: #F5F7FA !important;
+      opacity: 1 !important;
+      border: 1.5px solid rgba(119,129,144,.34) !important;
+      box-shadow: 0 4px 10px rgba(73,80,94,.04) !important;
+    }
+    .mail-item.read .mail-text h3 {
+      color: #6B7280 !important;
+      font-weight: 800 !important;
+      opacity: 1 !important;
+    }
+    .mail-item.read .mail-text p {
+      color: #A1A8B2 !important;
+      opacity: 1 !important;
+    }
+    .mail-item.read .mail-icon {
+      background: #E6E9EE !important;
+      color: #99A1AD !important;
+      opacity: 1 !important;
+    }
+    .mail-item.active {
+      border-color: #2B9DF0 !important;
+      box-shadow: 0 12px 26px rgba(43,157,240,.18) !important;
+      opacity: 1 !important;
+    }
+
+    /* Remove unread left blue bar */
+    .mail-item.unread::before { display: none !important; }
+
+    /* Remove message red dot indicator */
+    .mail-item.unread::after { display: none !important; }
   </style>
 </head>
 <body>
-  <div class="device-note" style="display:none"></div>
+  <div class="device-note">Zometool APP 风格｜813×375 屏幕预览</div>
   <div class="phone-frame"><div class="phone-screen"><div class="dynamic-island"></div><div class="screen-content">
   <div class="scene">
     <div class="top-title"><span class="back">↩</span><span>消息通知</span></div>
     <div class="nav-line"></div>
     <nav class="nav" id="nav">
-      <div class="nav-item active" data-tab="system">系统</div>
-      <div class="nav-item" data-tab="all">★ 全部</div>
-      <div class="nav-item" data-tab="feedback">★ 互动反馈</div>
+      <div class="nav-item active" data-tab="all">全部</div>
+      <div class="nav-item" data-tab="system">系统</div>
+      <div class="nav-item" data-tab="feedback">互动反馈</div>
     </nav>
 
     <section class="mail-shell">
@@ -998,7 +1428,7 @@
     </section>
 
     <aside class="mail-list-panel">
-      <div class="mail-count">消息数：<b id="countText">0</b>/200</div>
+      <div class="mail-count" title="时间展示边界：刚刚 / N分钟前 / 今天 HH:mm / 昨天 HH:mm / 周X HH:mm / 上周X / MM/DD / YYYY/MM/DD">已读：<b id="countText">0/0</b></div>
       <div class="starline"></div>
       <div class="mail-list" id="mailList"></div>
       <div class="panel-actions">
@@ -1034,33 +1464,34 @@
 
 <script>
 const messages = [
-  {id:1, tab:'system', unread:true, icon:'🎯', title:'新一期活动招募开始啦', text:'新一期拼搭活动正在招募中，点击去看看可查看活动规则和参与入口。', time:'刚刚', from:'系统 / UGC更新', valid:'29天'},
-  {id:2, tab:'system', unread:true, icon:'🖼️', title:'新作品集上线了', text:'官方新作品集已上线，收录多个优秀拼搭作品。', time:'8分钟前', from:'系统 / UGC更新', valid:'29天'},
-  {id:3, tab:'system', unread:true, icon:'📣', title:'你有一条新的营销信息', text:'限时活动信息已更新，点击去看看查看完整内容。', time:'16分钟前', from:'系统 / 营销信息', valid:'7天'},
-  {id:4, tab:'system', unread:true, icon:'🆕', title:'造型库上新了 36 个新造型', text:'本期造型库新增 36 个官方造型。列表仅展示代表造型，点击去看看查看完整上新列表。', time:'32分钟前', from:'系统 / 造型库', valid:'30天', batch:true, attach:[['🏗️','天空塔','#4B6BFF'],['🌉','三角桥','#22B573'],['🎡','摩天轮','#FF9D2E'],['🚀','火箭站','#7657FF']]},
-  {id:5, tab:'system', unread:true, icon:'🔧', title:'造型库功能模块更新', text:'造型库新增筛选和主题合集入口，可以更快找到想拼的造型。', time:'1小时前', from:'系统 / 造型库', valid:'30天'},
-  {id:6, tab:'system', unread:false, icon:'📚', title:'新课程上线了', text:'新的 Zometool 课程已上线，点击可查看课程详情。', time:'2小时前', from:'系统 / 课程', valid:'30天'},
-  {id:7, tab:'system', unread:false, icon:'⚠️', title:'作品暂未通过审核', text:'不通过原因：作品封面不清晰，无法准确展示拼搭主体。请重新上传清晰封面后再提交审核。', time:'今天 10:24', from:'系统 / 作品圈', valid:'永久', image:['🏗️','linear-gradient(135deg,#FF9D2E,#FFE08A)'], imageLabel:'作品图'},
-  {id:8, tab:'system', unread:false, icon:'🏅', title:'你获得了 V 标', text:'恭喜你获得 V 标，你的主页已展示新的身份标识。', time:'昨天 18:30', from:'系统 / 成就', valid:'永久'},
-  {id:9, tab:'system', unread:false, icon:'🎁', title:'造型被收藏入库', text:'你的造型已被收藏入官方入库列表，后续可能被更多用户看到。', time:'昨天 16:12', from:'系统 / 成就', valid:'永久', image:['🌉','linear-gradient(135deg,#22B573,#B8F2D4)'], imageLabel:'造型图'},
+  {id:1, sort:2300, tab:'system', unread:true, icon:'🎯', title:'新一期活动招募开始啦', text:'新一期拼搭活动正在招募中，点击去看看可查看活动规则和参与入口。', time:'刚刚', from:'UGC更新', valid:'29天', banner:{label:'活动 Banner', title:'ZOMETOOL 夏日拼搭招募', subtitle:'上传你的创意作品，赢取官方展示机会', icon:'🎯', bg:'linear-gradient(135deg,#2D74C4,#73C8FF 52%,#FFE7A6)'}},
+  {id:2, sort:2220, tab:'system', unread:true, icon:'🖼️', title:'新作品集上线了', text:'官方新作品集已上线，收录多个优秀拼搭作品。', time:'8分钟前', from:'UGC更新', valid:'29天'},
+  {id:3, sort:2141, tab:'system', unread:true, icon:'📣', title:'你有一条新的营销信息', text:'限时活动信息已更新，点击去看看查看完整内容。', time:'59分钟前', from:'营销信息', valid:'7天'},
+  {id:4, sort:1680, tab:'system', unread:true, icon:'🆕', title:'造型库上新了 36 个新造型', text:'本期造型库新增 36 个官方造型。列表仅展示代表造型，点击去看看查看完整上新列表。', time:'今天 09:30', from:'造型库', valid:'30天', batch:true, attach:[['🏗️','天空塔','#4B6BFF'],['🌉','三角桥','#22B573'],['🎡','摩天轮','#FF9D2E'],['🚀','火箭站','#7657FF']]},
+  {id:5, sort:900, tab:'system', unread:true, icon:'🔧', title:'造型库功能模块更新', text:'造型库新增筛选和主题合集入口，可以更快找到想拼的造型。', time:'昨天 18:20', from:'造型库', valid:'30天'},
+  {id:6, sort:650, tab:'system', unread:false, icon:'📚', title:'新课程上线了', text:'新的 Zometool 课程已上线，点击可查看课程详情。', time:'周一 10:00', from:'课程', valid:'30天'},
+  {id:7, sort:300, tab:'system', unread:false, icon:'⚠️', title:'作品暂未通过审核', text:'不通过原因：作品封面不清晰，无法准确展示拼搭主体。请重新上传清晰封面后再提交审核。', time:'上周一', from:'作品圈', valid:'永久', image:['🏗️','linear-gradient(135deg,#FF9D2E,#FFE08A)'], imageLabel:'作品图'},
+  {id:8, sort:120, tab:'system', unread:false, icon:'🏅', title:'你获得了 V 标', text:'恭喜你获得 V 标，你的主页已展示新的身份标识。', time:'06/12', from:'成就', valid:'永久'},
+  {id:9, sort:20, tab:'system', unread:false, icon:'🎁', title:'造型被收藏入库', text:'你的造型已被收藏入官方入库列表，后续可能被更多用户看到。', time:'2025/12/28', from:'成就', valid:'永久', image:['🌉','linear-gradient(135deg,#22B573,#B8F2D4)'], imageLabel:'造型图'},
 
-  {id:10, tab:'feedback', unread:true, icon:'⭐', title:'你的造型被收藏了 9 次', text:'你的入库造型被收藏了 9 次。收藏反馈按造型聚合展示。', time:'昨天 14:05', from:'互动反馈 / 造型库', valid:'永久', image:['🏛️','linear-gradient(135deg,#FF9D2E,#FFE08A)'], imageLabel:'造型图'},
-  {id:11, tab:'feedback', unread:false, icon:'🧱', title:'有人跟拼了你的造型', text:'你的入库造型有 3 个新的跟拼作品，点击可查看跟拼列表。', time:'昨天 11:40', from:'互动反馈 / 造型库', valid:'永久', image:['🌉','linear-gradient(135deg,#22B573,#B8F2D4)'], imageLabel:'造型图'},
-  {id:12, tab:'feedback', unread:false, icon:'🔁', title:'你的造型被分享了 15 次', text:'你的入库造型被分享了 15 次。分享消息按造型聚合。', time:'上周五', from:'互动反馈 / 造型库', valid:'永久', image:['🏗️','linear-gradient(135deg,#F7971E,#FFD200)'], imageLabel:'造型图'},
-  {id:13, tab:'feedback', unread:false, icon:'💎', title:'跟拼作品被收藏了 6 次', text:'你的跟拼作品【星际直升机】被收藏了 6 次。', time:'上周五', from:'互动反馈 / 造型库', valid:'永久', image:['🛰️','linear-gradient(135deg,#2D74C4,#9FD8FF)'], imageLabel:'作品图'},
-  {id:14, tab:'feedback', unread:false, icon:'👍', title:'跟拼作品被点赞了 24 次', text:'你的跟拼作品【星际直升机】收到了 24 个赞。', time:'上周五', from:'互动反馈 / 造型库', valid:'永久', image:['🧩','linear-gradient(135deg,#11998E,#38EF7D)'], imageLabel:'作品图'},
-  {id:15, tab:'feedback', unread:false, icon:'🔁', title:'跟拼作品被分享了 8 次', text:'你的跟拼作品【星际直升机】被分享了 8 次。', time:'上周四', from:'互动反馈 / 造型库', valid:'永久', image:['🕊️','linear-gradient(135deg,#7657FF,#E6B8FF)'], imageLabel:'作品图'},
-  {id:16, tab:'feedback', unread:false, icon:'🏆', title:'跟拼作品收到了夸一夸', text:'你的跟拼作品【星际直升机】收到了夸一夸：这个结构很稳，配色也很漂亮！', time:'上周三', from:'互动反馈 / 造型库', valid:'永久', image:['🏆','linear-gradient(135deg,#FF7A59,#FFD166)'], imageLabel:'作品图'},
-  {id:17, tab:'feedback', unread:false, icon:'💬', title:'共创达人评论了你的跟拼作品', text:'共创达人评论了你的跟拼作品【星际直升机】：这个角度处理得很好，可以试试加高底座。', time:'上周三', from:'互动反馈 / 造型库', valid:'永久', image:['🛠️','linear-gradient(135deg,#8E2DE2,#4A00E0)'], imageLabel:'作品图'},
-  {id:18, tab:'feedback', unread:true, icon:'👍', title:'你的作品收到了 18 个赞', text:'你的作品【夏日摩天轮】收到了 18 个赞。', time:'上周二', from:'互动反馈 / 作品圈', valid:'永久', image:['🚀','linear-gradient(135deg,#4B6BFF,#88D8FF)'], imageLabel:'作品图'},
-  {id:19, tab:'feedback', unread:false, icon:'⭐', title:'你的作品被收藏了 12 次', text:'你的作品【夏日摩天轮】被收藏了 12 次。', time:'上周二', from:'互动反馈 / 作品圈', valid:'永久', image:['🛰️','linear-gradient(135deg,#2D74C4,#9FD8FF)'], imageLabel:'作品图'},
-  {id:20, tab:'feedback', unread:false, icon:'🔁', title:'你的作品被分享了 6 次', text:'你的作品【夏日摩天轮】被分享了 6 次。', time:'上周一', from:'互动反馈 / 作品圈', valid:'永久', image:['🕊️','linear-gradient(135deg,#7657FF,#E6B8FF)'], imageLabel:'作品图'},
-  {id:21, tab:'feedback', unread:false, icon:'🏆', title:'你的作品收到了夸一夸', text:'你的作品【夏日摩天轮】收到了夸一夸：这件作品太有创意了！', time:'上周一', from:'互动反馈 / 作品圈', valid:'永久', image:['🏆','linear-gradient(135deg,#FF7A59,#FFD166)'], imageLabel:'作品图'},
-  {id:22, tab:'feedback', unread:false, icon:'💬', title:'共创达人评论了你的作品', text:'共创达人评论了你的作品【夏日摩天轮】：结构很稳定，顶部造型也很有创意！', time:'上周一', from:'互动反馈 / 作品圈', valid:'永久', image:['🚀','linear-gradient(135deg,#4B6BFF,#88D8FF)'], imageLabel:'作品图'},
-  {id:23, tab:'feedback', unread:false, icon:'👥', title:'你有新的粉丝', text:'安安、木木等 5 人关注了你。新增粉丝可在 30 分钟内聚合。', time:'上周一', from:'互动反馈 / 作品圈', valid:'永久'}
+  {id:10, sort:2290, tab:'feedback', unread:true, icon:'⭐', title:'你的造型被收藏了 9 次', text:'安安和其他 8 个用户收藏了你的造型。', time:'刚刚', from:'造型库', valid:'永久', image:['🏛️','linear-gradient(135deg,#FF9D2E,#FFE08A)'], imageLabel:'造型图'},
+  {id:11, sort:2188, tab:'feedback', unread:false, icon:'🧱', title:'有人跟拼了你的造型', text:'木木和其他 2 个用户跟拼了你的造型。', time:'12分钟前', from:'造型库', valid:'永久', image:['🌉','linear-gradient(135deg,#22B573,#B8F2D4)'], imageLabel:'造型图'},
+  {id:12, sort:1765, tab:'feedback', unread:false, icon:'🔁', title:'你的造型被分享了 15 次', text:'乐乐和其他 14 个用户分享了你的造型。', time:'今天 14:05', from:'造型库', valid:'永久', image:['🏗️','linear-gradient(135deg,#F7971E,#FFD200)'], imageLabel:'造型图'},
+  {id:13, sort:880, tab:'feedback', unread:false, icon:'💎', title:'跟拼作品被收藏了 6 次', text:'小小明和其他 5 个用户收藏了你的跟拼作品【星际直升机】。', time:'昨天 21:16', from:'造型库', valid:'永久', image:['🛰️','linear-gradient(135deg,#2D74C4,#9FD8FF)'], imageLabel:'作品图'},
+  {id:14, sort:620, tab:'feedback', unread:false, icon:'👍', title:'跟拼作品被点赞了 24 次', text:'豆豆和其他 23 个用户赞了你的跟拼作品【星际直升机】。', time:'周五 18:30', from:'造型库', valid:'永久', image:['🧩','linear-gradient(135deg,#11998E,#38EF7D)'], imageLabel:'作品图'},
+  {id:15, sort:290, tab:'feedback', unread:false, icon:'🔁', title:'跟拼作品被分享了 8 次', text:'可可和其他 7 个用户分享了你的跟拼作品【星际直升机】。', time:'上周一', from:'造型库', valid:'永久', image:['🕊️','linear-gradient(135deg,#7657FF,#E6B8FF)'], imageLabel:'作品图'},
+  {id:16, sort:110, tab:'feedback', unread:false, icon:'🏆', title:'有人夸了夸你的跟拼作品', text:'天天夸了夸你的跟拼作品【星际直升机】：这个结构很稳，配色也很漂亮！', time:'06/03', from:'造型库', valid:'永久', image:['🏆','linear-gradient(135deg,#FF7A59,#FFD166)'], imageLabel:'作品图'},
+  {id:17, sort:10, tab:'feedback', unread:false, icon:'💬', title:'共创达人评论了你的跟拼作品', text:'共创达人橙子评论了你的跟拼作品【星际直升机】：这个角度处理得很好，可以试试加高底座。', time:'2025/11/18', from:'造型库', valid:'永久', image:['🛠️','linear-gradient(135deg,#8E2DE2,#4A00E0)'], imageLabel:'作品图'},
+  {id:18, sort:2285, tab:'feedback', unread:true, icon:'👍', title:'你的作品收到了 18 个赞', text:'乐乐和其他 17 个用户赞了你的作品【夏日摩天轮】。', time:'刚刚', from:'作品圈', valid:'永久', image:['🚀','linear-gradient(135deg,#4B6BFF,#88D8FF)'], imageLabel:'作品图'},
+  {id:19, sort:1900, tab:'feedback', unread:false, icon:'⭐', title:'你的作品被收藏了 12 次', text:'安安和其他 11 个用户收藏了你的作品【夏日摩天轮】。', time:'今天 16:20', from:'作品圈', valid:'永久', image:['🛰️','linear-gradient(135deg,#2D74C4,#9FD8FF)'], imageLabel:'作品图'},
+  {id:20, sort:1600, tab:'feedback', unread:false, icon:'🔁', title:'你的作品被分享了 6 次', text:'木木和其他 5 个用户分享了你的作品【夏日摩天轮】。', time:'昨天 20:05', from:'作品圈', valid:'永久', image:['🕊️','linear-gradient(135deg,#7657FF,#E6B8FF)'], imageLabel:'作品图'},
+  {id:21, sort:780, tab:'feedback', unread:false, icon:'🏆', title:'有人夸了夸你的作品', text:'小宇夸了夸你的作品【夏日摩天轮】：这件作品太有创意了！', time:'周三 11:10', from:'作品圈', valid:'永久', image:['🏆','linear-gradient(135deg,#FF7A59,#FFD166)'], imageLabel:'作品图'},
+  {id:22, sort:100, tab:'feedback', unread:false, icon:'💬', title:'共创达人评论了你的作品', text:'共创达人橙子评论了你的作品【夏日摩天轮】：结构很稳定，顶部造型也很有创意！', time:'06/18', from:'作品圈', valid:'永久', image:['🚀','linear-gradient(135deg,#4B6BFF,#88D8FF)'], imageLabel:'作品图'},
+  {id:23, sort:5, tab:'feedback', unread:false, icon:'👥', title:'你有新的粉丝', text:'安安和其他 4 个用户关注了你。', time:'2025/10/01', from:'作品圈', valid:'永久'}
 ];
-let currentTab = 'system';
+let currentTab = 'all';
 let currentId = 1;
+const sessionOrder = {};
 const mailList = document.getElementById('mailList');
 const detailPaper = document.getElementById('detailPaper');
 const countText = document.getElementById('countText');
@@ -1069,13 +1500,35 @@ const confirmMask = document.getElementById('confirmMask');
 const singleDeleteMask = document.getElementById('singleDeleteMask');
 const previewMask = document.getElementById('previewMask');
 const previewBox = document.getElementById('previewBox');
-function filtered(){ return currentTab === 'all' ? messages : messages.filter(m => m.tab === currentTab); }
+function tabMessages(tab){ return tab === 'all' ? messages : messages.filter(m => m.tab === tab); }
+function buildFreshOrder(tab){
+  return tabMessages(tab)
+    .sort((a,b)=>{
+      if(a.unread !== b.unread) return a.unread ? -1 : 1;
+      return (b.sort||0)-(a.sort||0);
+    })
+    .map(m=>m.id);
+}
+function refreshTabOrder(tab){ sessionOrder[tab] = buildFreshOrder(tab); }
+function filtered(){
+  if(!sessionOrder[currentTab]) refreshTabOrder(currentTab);
+  const ids = sessionOrder[currentTab];
+  const data = tabMessages(currentTab);
+  return [...data].sort((a,b)=>{
+    const indexA = ids.indexOf(a.id);
+    const indexB = ids.indexOf(b.id);
+    const safeA = indexA === -1 ? Number.MAX_SAFE_INTEGER : indexA;
+    const safeB = indexB === -1 ? Number.MAX_SAFE_INTEGER : indexB;
+    if(safeA !== safeB) return safeA - safeB;
+    return (b.sort||0)-(a.sort||0);
+  });
+}
 function ensureCurrent(){ const data = filtered(); if(!data.find(m => m.id === currentId)) currentId = (data.find(m=>m.unread) || data[0] || {}).id; }
 function render(){
   ensureCurrent();
   const data = filtered();
-  countText.textContent = messages.length;
-  mailList.innerHTML = data.map(m => `<div class="mail-item ${m.id===currentId?'active':''}" onclick="selectMail(${m.id})"><div class="mail-icon ${m.gift?'gift':''}">${m.icon}</div><div class="mail-text"><h3>${m.title}</h3><p>${m.time}</p></div></div>`).join('') || '<div style="color:#fff;font-weight:900;text-align:center;margin-top:80px;">暂无消息</div>';
+  countText.textContent = `${data.filter(m=>!m.unread).length}/${data.length}`;
+  mailList.innerHTML = data.map(m => `<div class="mail-item ${m.id===currentId?'active':''} ${m.unread?'unread':'read'}" onclick="selectMail(${m.id})"><div class="mail-icon ${m.gift?'gift':''}">${m.icon}</div><div class="mail-text"><h3>${m.title}</h3><p>${m.time}</p></div></div>`).join('') || '<div style="color:#fff;font-weight:900;text-align:center;margin-top:80px;">暂无消息</div>';
   renderDetail();
 }
 function renderDetail(){
@@ -1083,13 +1536,31 @@ function renderDetail(){
   if(!m){ detailPaper.innerHTML = '<div style="display:grid;place-items:center;height:100%;font-size:22px;color:#7f8798;font-weight:900;">暂无消息</div>'; return; }
   const img = m.image ? `<div class="media-block"><div><div class="attach-title">🔗 ${m.imageLabel || '展示图'}</div><div class="attachments"><div class="attach-card" style="background:${m.image[1]}" onclick="openPreview('${m.image[0]}','${m.title.replace(/'/g,"\\'")}','${m.image[1]}')">${m.image[0]}</div></div></div><div class="media-copy"><b>点击图片可放大预览</b><br>用于补充识别具体作品或造型。</div></div>` : '';
   const attach = m.attach ? `<div class="media-block batch"><div class="attach-title">🔗 代表造型</div><div class="attachments">${m.attach.map(a=>`<div class="attach-card" style="background:${a[2]}">${a[0]}<span>${a[1]}</span></div>`).join('')}</div><div class="media-copy"><b>仅展示部分代表造型</b>，完整上新列表点击去看看查看。</div></div>` : '';
-  const canGo = m.tab === 'system' || /跟拼|评论|夸一夸|粉丝|收藏|点赞|分享/.test(m.title);
+  const banner = m.banner ? `<div class="activity-banner" style="background:${m.banner.bg}" onclick="goViewCurrent()"><div class="banner-copy"><div class="banner-label">${m.banner.label}</div><b>${m.banner.title}</b><span>${m.banner.subtitle}</span></div><div class="banner-icon">${m.banner.icon}</div></div>` : '';
+  const canGo = m.tab === 'system' || /跟拼|评论|夸一夸|夸了夸|粉丝|收藏|点赞|分享/.test(m.title);
   const actionText = m.title.includes('暂未通过审核') ? '去修改' : '去看看';
   const action = canGo ? `<button class="goto-mail" onclick="goViewCurrent()">${actionText}</button>` : '';
-  detailPaper.innerHTML = `<div class="detail-head"><h2 class="detail-title">${m.title}</h2><div class="detail-time">${m.time}</div></div><div class="meta-row"><span>来自：${m.from}</span><span>保留：${m.valid}</span></div><div class="mail-body">${m.text.replace(/不通过原因|夸一夸内容|共创达人评论/g, '<span class="hot">$&</span>')}</div>${img || attach}<div class="detail-actions">${action}<button class="delete-mail" onclick="openSingleDeleteConfirm()">删除消息</button></div>`;
+  const body = formatMessageBody(m.text);
+  detailPaper.innerHTML = `<div class="detail-head"><h2 class="detail-title">${m.title}</h2><div class="detail-time">${m.time}</div></div><div class="meta-row"><span>来自：${m.from}</span></div><div class="mail-body">${body}</div>${banner || img || attach}<div class="detail-actions">${action}<button class="delete-mail" onclick="openSingleDeleteConfirm()">删除消息</button></div>`;
 }
+
+function formatMessageBody(text){
+  const highlighted = text.replace(/不通过原因|夸一夸|夸了夸|共创达人评论/g, '<span class="hot">$&</span>');
+  const names = ['安安','木木','乐乐','小小明','豆豆','可可','天天','橙子','小宇'];
+  for(const name of names){
+    if(highlighted.startsWith(name)){
+      return highlighted.replace(name, `<span class="user-link" onclick="openUserProfile('${name}')">${name}</span>`);
+    }
+    const expert = `共创达人${name}`;
+    if(highlighted.startsWith(expert)){
+      return highlighted.replace(expert, `<span class="user-link" onclick="openUserProfile('${name}')">${expert}</span>`);
+    }
+  }
+  return highlighted;
+}
+function openUserProfile(name){ showToast(`进入${name}的个人主页`); }
 function selectMail(id){ currentId = id; const m = messages.find(x=>x.id===id); if(m) m.unread=false; render(); }
-function deleteCurrent(){ const idx = messages.findIndex(m=>m.id===currentId); if(idx>=0) messages.splice(idx,1); currentId = (filtered()[0]||messages[0]||{}).id; render(); showToast('消息已删除'); }
+function deleteCurrent(){ const idx = messages.findIndex(m=>m.id===currentId); if(idx>=0) messages.splice(idx,1); Object.keys(sessionOrder).forEach(tab=>{ sessionOrder[tab] = sessionOrder[tab].filter(id=>id!==currentId); }); currentId = (filtered()[0]||messages[0]||{}).id; render(); showToast('消息已删除'); }
 function openSingleDeleteConfirm(){ singleDeleteMask.classList.add('show'); }
 function closeSingleDeleteConfirm(){ singleDeleteMask.classList.remove('show'); }
 function confirmSingleDelete(){ closeSingleDeleteConfirm(); deleteCurrent(); }
@@ -1098,26 +1569,22 @@ function goViewCurrent(){ const m = messages.find(x=>x.id===currentId); showToas
 function openPreview(icon,title,bg){ previewBox.textContent=icon; previewBox.dataset.title=title; previewBox.style.background=bg; previewMask.classList.add('show'); }
 function closePreview(){ previewMask.classList.remove('show'); }
 function closeDeleteConfirm(){ confirmMask.classList.remove('show'); }
-function confirmDeleteRead(){ for(let i=messages.length-1;i>=0;i--){ if(!messages[i].unread) messages.splice(i,1); } closeDeleteConfirm(); currentId=(filtered().find(m=>m.unread)||filtered()[0]||messages[0]||{}).id; render(); showToast('已删除已读消息'); }
+function confirmDeleteRead(){ const readIds = messages.filter(m=>!m.unread).map(m=>m.id); for(let i=messages.length-1;i>=0;i--){ if(!messages[i].unread) messages.splice(i,1); } Object.keys(sessionOrder).forEach(tab=>{ sessionOrder[tab] = sessionOrder[tab].filter(id=>!readIds.includes(id)); }); closeDeleteConfirm(); currentId=(filtered().find(m=>m.unread)||filtered()[0]||messages[0]||{}).id; render(); showToast('已删除已读消息'); }
 document.getElementById('readAll').onclick = () => { messages.forEach(m=>m.unread=false); render(); showToast('已全部标记已读'); };
 document.getElementById('deleteRead').onclick = () => confirmMask.classList.add('show');
-document.querySelectorAll('.nav-item').forEach(n => n.onclick = () => { currentTab=n.dataset.tab; document.querySelectorAll('.nav-item').forEach(x=>x.classList.toggle('active',x===n)); currentId=(filtered().find(m=>m.unread)||filtered()[0]||{}).id; render(); });
+document.querySelectorAll('.nav-item').forEach(n => n.onclick = () => { currentTab=n.dataset.tab; refreshTabOrder(currentTab); document.querySelectorAll('.nav-item').forEach(x=>x.classList.toggle('active',x===n)); currentId=(filtered().find(m=>m.unread)||filtered()[0]||{}).id; render(); });
 confirmMask.onclick = e => { if(e.target===confirmMask) closeDeleteConfirm(); };
 singleDeleteMask.onclick = e => { if(e.target===singleDeleteMask) closeSingleDeleteConfirm(); };
 previewMask.onclick = e => { if(e.target===previewMask) closePreview(); };
-render();
 
-	const DESIGN_W = 1180, DESIGN_H = 560;
-	const phoneScreen = document.querySelector(".phone-screen");
-	function resize() {
-	  const vw = document.documentElement.clientWidth;
-	  const vh = document.documentElement.clientHeight;
-	  const scale = Math.min(vw / DESIGN_W, vh / DESIGN_H);
-	  phoneScreen.style.transform = "scale(" + scale + ")";
-	}
-	window.addEventListener("resize", resize);
-	window.addEventListener("orientationchange", function () { setTimeout(resize, 50); });
-	resize();
+function setAppViewport(){
+  document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
+  document.documentElement.style.setProperty('--app-width', `${window.innerWidth}px`);
+}
+setAppViewport();
+window.addEventListener('resize', setAppViewport);
+window.addEventListener('orientationchange', () => setTimeout(setAppViewport, 250));
+render();
 </script>
 </body>
 </html>
