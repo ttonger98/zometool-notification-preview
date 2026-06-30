@@ -1,0 +1,1111 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Zometool 消息通知中心 iPhone 17 Pro 适配预览</title>
+  <style>
+    :root {
+      --w: 1180px;
+      --h: 560px;
+      --bg: #b9c7df;
+      --panel: #72c7ff;
+      --panel-dark: #567df5;
+      --paper: #f6fbff;
+      --ink: #25304a;
+      --muted: #6f7890;
+      --green: #7AF06A;
+      --gold: #FFD65A;
+      --blue: #45B9FF;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: radial-gradient(circle at 50% 10%, #dfe8f8, #aebbd0 70%);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--ink);
+    }
+    .scene {
+      width: var(--w);
+      height: var(--h);
+      position: relative;
+      overflow: hidden;
+      border-radius: 24px;
+      background:
+        radial-gradient(circle at 55% 80%, rgba(255,255,255,.32), transparent 24%),
+        linear-gradient(180deg, #c8d3e7, #aab8d1);
+      box-shadow: 0 30px 90px rgba(38, 54, 86, .28);
+    }
+    .scene::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(90deg, rgba(255,255,255,.12) 1px, transparent 1px), linear-gradient(rgba(255,255,255,.08) 1px, transparent 1px);
+      background-size: 90px 90px;
+      opacity: .28;
+    }
+    .top-title {
+      position: absolute;
+      left: 86px;
+      top: 22px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 26px;
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 3px 0 rgba(33, 50, 72, .45), 0 0 12px rgba(255,255,255,.55);
+    }
+    .back { font-size: 32px; color: #FFE94E; filter: drop-shadow(0 2px 0 rgba(0,0,0,.36)); }
+    .nav {
+      position: absolute;
+      left: 70px;
+      top: 88px;
+      width: 130px;
+      color: #fff;
+      font-size: 20px;
+      font-weight: 900;
+      text-shadow: 0 2px 4px rgba(30, 44, 78, .38);
+    }
+    .nav-item {
+      height: 58px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-left: 10px;
+      margin-bottom: 16px;
+      cursor: pointer;
+      position: relative;
+      opacity: .82;
+    }
+    .nav-item.active {
+      opacity: 1;
+      color: #1f5931;
+      background: linear-gradient(180deg, #91ff70, #63e86b);
+      border-radius: 8px;
+      box-shadow: 0 5px 0 rgba(46, 145, 69, .42), inset 0 0 0 2px rgba(255,255,255,.42);
+      text-shadow: none;
+      justify-content: center;
+      padding: 0;
+    }
+    .nav-item.active::before {
+      content: "✦";
+      position: absolute;
+      top: -14px;
+      left: 8px;
+      color: #2c5831;
+      font-size: 16px;
+    }
+    .nav-line {
+      position: absolute;
+      left: 113px;
+      top: 122px;
+      height: 230px;
+      border-left: 2px dotted rgba(255,255,255,.55);
+    }
+    .mail-shell {
+      position: absolute;
+      left: 250px;
+      top: 62px;
+      width: 842px;
+      height: 430px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, #6892ff, #546fe0);
+      box-shadow: 0 16px 30px rgba(54, 78, 146, .36), inset 0 0 0 3px rgba(90, 117, 247, .8);
+      padding: 18px 18px 18px 300px;
+    }
+    .mail-list-panel {
+      position: absolute;
+      left: 236px;
+      top: 52px;
+      width: 318px;
+      height: 452px;
+      border-radius: 20px;
+      background: linear-gradient(180deg, #7ad3ff, #62aaf4);
+      box-shadow: 0 14px 28px rgba(50, 79, 150, .35), inset 0 0 0 3px rgba(78, 151, 255, .65);
+      padding: 48px 14px 70px;
+      z-index: 3;
+    }
+    .mail-count {
+      position: absolute;
+      left: 24px;
+      top: 13px;
+      color: #fff;
+      font-size: 20px;
+      font-weight: 900;
+      text-shadow: 0 2px 3px rgba(43, 79, 145, .55);
+    }
+    .mail-count b { color: #FFE640; }
+    .starline {
+      position: absolute;
+      left: 120px;
+      top: 36px;
+      width: 150px;
+      height: 4px;
+      border-radius: 4px;
+      background: #FEE83F;
+    }
+    .starline::after { content: "★"; color: #FEE83F; position: absolute; right: -16px; top: -10px; font-size: 18px; }
+    .mail-list {
+      height: 100%;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding-right: 5px;
+    }
+    .mail-list::-webkit-scrollbar { width: 5px; }
+    .mail-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,.5); border-radius: 999px; }
+    .mail-item {
+      min-height: 78px;
+      border-radius: 7px;
+      background: rgba(224, 220, 255, .82);
+      margin-bottom: 10px;
+      display: grid;
+      grid-template-columns: 52px 1fr;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      box-shadow: inset 0 -8px 20px rgba(130, 135, 210, .10);
+      overflow: hidden;
+    }
+    .mail-item.active {
+      border-color: #FFE520;
+      box-shadow: 0 0 0 2px rgba(255,229,32,.5), inset 0 -8px 20px rgba(130,135,210,.14);
+    }
+    .mail-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #9EA4D7;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 23px;
+      position: relative;
+    }
+    .mail-icon.gift::after { content: "🎁"; position: absolute; right: -8px; bottom: -7px; font-size: 20px; }
+    .mail-text { min-width: 0; }
+    .mail-text h3 {
+      margin: 0;
+      font-size: 17px;
+      line-height: 1.15;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .mail-text p { margin: 5px 0 0; color: #5E6580; font-size: 13px; font-weight: 800; }
+    .panel-actions {
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      bottom: 16px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .game-btn {
+      height: 44px;
+      border: 0;
+      border-radius: 7px;
+      font-size: 20px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,.26), 0 4px 0 rgba(54,79,150,.24);
+    }
+    .game-btn.disabled { background: linear-gradient(180deg, #D4D4D4, #A7A7A7); color: #535353; }
+    .game-btn.green { background: linear-gradient(180deg, #8DF280, #44D966); color: #155826; }
+    .game-btn.gold { background: linear-gradient(180deg, #FFE083, #C59A42); color: #654313; }
+    .game-btn.blue { background: linear-gradient(180deg, #69C5FF, #3096E5); color: #0c4778; }
+    .detail-paper {
+      width: 100%;
+      height: 100%;
+      border-radius: 14px;
+      background: linear-gradient(180deg, #FBFEFF, #EAF6FF);
+      box-shadow: inset 0 0 0 2px rgba(161, 212, 255, .75);
+      padding: 30px 28px 24px 34px;
+      position: relative;
+      overflow: hidden;
+    }
+    .detail-paper::after {
+      content: "";
+      position: absolute;
+      right: 20px;
+      bottom: 18px;
+      width: 170px;
+      height: 170px;
+      border-radius: 50%;
+      background: rgba(135, 197, 255, .12);
+    }
+    .detail-head {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 18px;
+      align-items: center;
+      padding-bottom: 10px;
+      border-bottom: 2px solid rgba(144, 170, 199, .36);
+    }
+    .detail-title { margin: 0; font-size: 27px; line-height: 1.22; font-weight: 900; }
+    .detail-time { font-size: 16px; color: #8b92a2; font-weight: 800; white-space: nowrap; }
+    .meta-row { display: flex; justify-content: space-between; margin: 10px 0 8px; color: #7f8798; font-size: 15px; font-weight: 800; }
+    .mail-body { font-size: 19px; line-height: 1.55; font-weight: 850; color: #2d354b; margin-top: 8px; max-height: 104px; overflow: hidden; }
+    .mail-body .hot { color: #ff9900; }
+    .media-block {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: 156px 1fr;
+      gap: 18px;
+      align-items: center;
+      max-width: 420px;
+      position: relative;
+      z-index: 1;
+    }
+    .attach-title {
+      margin: 0 0 10px;
+      width: fit-content;
+      min-width: 136px;
+      height: 30px;
+      background: #9EE2FF;
+      color: #244b63;
+      border-radius: 3px 18px 18px 3px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-left: 12px;
+      font-size: 17px;
+      font-weight: 900;
+    }
+    .media-copy {
+      color: #486073;
+      font-size: 16px;
+      line-height: 1.45;
+      font-weight: 850;
+    }
+    .media-copy b { color: #244b63; }
+    .attachments { display: flex; gap: 12px; margin-top: 0; flex-wrap: wrap; }
+    .attach-card {
+      width: 104px;
+      height: 104px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      font-size: 44px;
+      color: #fff;
+      position: relative;
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,.25);
+      cursor: pointer;
+    }
+    .media-block.batch { grid-template-columns: 1fr; max-width: 430px; }
+    .media-block.batch .attach-card { width: 76px; height: 76px; font-size: 32px; }
+    .attach-card::after { content: "✓"; position: absolute; right: -5px; top: -7px; width: 21px; height: 21px; border-radius: 50%; background: #1a9a64; color: #fff; display: grid; place-items: center; font-size: 15px; }
+    .attach-card span { position: absolute; right: 5px; bottom: 2px; color: #fff; font-size: 18px; font-weight: 900; text-shadow: 0 2px 5px rgba(0,0,0,.55); }
+
+    .detail-actions {
+      position: absolute;
+      right: 24px;
+      bottom: 24px;
+      display: flex;
+      gap: 12px;
+      z-index: 2;
+    }
+    .goto-mail {
+      min-width: 124px;
+      height: 44px;
+      border: 0;
+      border-radius: 14px;
+      background: linear-gradient(180deg, #FFC64A, #FFA12E);
+      color: #7B4B13;
+      font-size: 20px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 12px 20px rgba(255,166,46,.20), inset 0 0 0 1px rgba(255,255,255,.58);
+    }
+    .delete-mail {
+      min-width: 124px;
+      height: 44px;
+      border: 0;
+      border-radius: 7px;
+      background: linear-gradient(180deg, #70F080, #38D668);
+      color: #145b25;
+      font-size: 20px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,.28), 0 4px 0 rgba(46,145,69,.34);
+    }
+    .modal-mask, .preview-mask {
+      position: absolute;
+      inset: 0;
+      background: rgba(5, 12, 28, .66);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+    .modal-mask.show, .preview-mask.show { display: flex; }
+    .confirm-modal {
+      width: 420px;
+      border-radius: 24px;
+      background: linear-gradient(180deg, rgba(88, 138, 214, .98), rgba(63, 99, 171, .98));
+      border: 2px solid rgba(172,220,255,.65);
+      padding: 28px;
+      color: #fff;
+      text-align: center;
+      box-shadow: 0 24px 70px rgba(0,0,0,.36);
+    }
+    .confirm-modal h3 { margin: 0 0 12px; font-size: 22px; }
+    .confirm-modal p { margin: 0 0 22px; font-size: 17px; }
+    .confirm-actions { display: flex; justify-content: center; gap: 16px; }
+    .preview-box {
+      width: 650px;
+      height: 350px;
+      border-radius: 22px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 94px;
+      box-shadow: inset 0 0 0 3px rgba(255,255,255,.25), 0 24px 80px rgba(0,0,0,.46);
+      position: relative;
+    }
+    .preview-box::after { content: attr(data-title); position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 18px; font-size: 18px; font-weight: 900; background: linear-gradient(180deg, transparent, rgba(0,0,0,.42)); }
+    .preview-close { position: absolute; right: 40px; top: 30px; color: #fff; font-size: 42px; cursor: pointer; z-index: 11; }
+    .toast { position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%) translateY(20px); background: rgba(34, 55, 92, .92); color: #fff; border-radius: 999px; padding: 10px 18px; opacity: 0; transition: .2s; z-index: 12; font-weight: 900; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    .device-note {
+      position: fixed;
+      left: 50%;
+      top: 24px;
+      transform: translateX(-50%);
+      color: rgba(75,88,116,.78);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: .04em;
+    }
+    .phone-frame {
+      width: 1180px;
+      height: 560px;
+      border-radius: 42px;
+      padding: 0;
+      background: transparent;
+      box-shadow: 0 30px 80px rgba(23,32,51,.24);
+      position: relative;
+      overflow: hidden;
+    }
+    .phone-frame::before,
+    .phone-frame::after { display: none; }
+    .phone-screen {
+      width: 100%;
+      height: 100%;
+      border-radius: 42px;
+      overflow: hidden;
+      position: relative;
+      background: #EEF2F8;
+      box-shadow: none;
+    }
+    .dynamic-island { display: none; }
+    .screen-content {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1180px;
+      height: 560px;
+      transform: none;
+      transform-origin: left top;
+    }
+    .screen-content .scene {
+      box-shadow: none;
+      border-radius: 42px;
+    }
+
+    /* Zometool APP style refresh */
+    :root {
+      --w: 1180px;
+      --h: 560px;
+      --app-bg: #FFF8EC;
+      --app-bg-2: #FFF1D8;
+      --app-card: rgba(255,255,255,.86);
+      --app-card-strong: #FFFFFF;
+      --app-ink: #454A57;
+      --app-muted: #8D929C;
+      --app-blue: #5DB8F3;
+      --app-cyan: #79E0DD;
+      --app-green: #8EDC86;
+      --app-yellow: #FFC64A;
+      --app-orange: #FF9D2E;
+      --app-red: #F06A7A;
+      --app-line: rgba(69,74,87,.10);
+    }
+    body {
+      background:
+        radial-gradient(circle at 8% 8%, rgba(255,210,102,.36), transparent 20%),
+        radial-gradient(circle at 82% 82%, rgba(255,231,164,.52), transparent 22%),
+        linear-gradient(135deg, #FFF5DE, #F7FBFF 58%, #FFF7EA);
+    }
+    .scene {
+      background:
+        radial-gradient(circle at 11% 86%, rgba(255,213,91,.28), transparent 8%),
+        radial-gradient(circle at 48% 24%, rgba(255,217,94,.22), transparent 7%),
+        radial-gradient(circle at 86% 28%, rgba(125,224,221,.20), transparent 12%),
+        linear-gradient(135deg, #FFF7E9 0%, #FFFDF8 48%, #F3FBFF 100%);
+      color: var(--app-ink);
+    }
+    .scene::before {
+      background-image: none;
+      opacity: 1;
+    }
+    .scene::after {
+      content: "";
+      position: absolute;
+      left: 26px;
+      bottom: 22px;
+      width: 106px;
+      height: 108px;
+      border-radius: 28px;
+      background:
+        linear-gradient(90deg, rgba(255,216,119,.38) 16px, transparent 16px) 0 0 / 34px 100% no-repeat,
+        linear-gradient(90deg, rgba(255,226,151,.32) 20px, transparent 20px) 52px 20px / 54px 88px no-repeat;
+      opacity: .5;
+      pointer-events: none;
+    }
+    .top-title {
+      left: 66px;
+      top: 30px;
+      color: var(--app-ink);
+      font-size: 27px;
+      text-shadow: none;
+      letter-spacing: -.02em;
+    }
+    .back {
+      color: var(--app-yellow);
+      filter: drop-shadow(0 2px 4px rgba(255,198,74,.36));
+    }
+    .nav {
+      left: 70px;
+      top: 112px;
+      color: #7F8490;
+      text-shadow: none;
+      font-size: 20px;
+    }
+    .nav-line { border-left-color: rgba(148,153,165,.26); }
+    .nav-item {
+      color: #8E929B;
+      opacity: 1;
+      padding-left: 8px;
+      text-shadow: none;
+    }
+    .nav-item.active {
+      color: #3F6B45;
+      background: linear-gradient(180deg, #CBF7A3, #78E57A);
+      border-radius: 12px;
+      box-shadow: 0 10px 22px rgba(112,205,104,.24), inset 0 0 0 1px rgba(255,255,255,.74);
+    }
+    .nav-item.active::before { color: #6DBA67; }
+    .mail-shell {
+      background: linear-gradient(135deg, rgba(107,194,255,.76), rgba(121,224,221,.55));
+      border-radius: 24px;
+      box-shadow: 0 20px 44px rgba(91,155,209,.20);
+      padding: 18px 18px 18px 300px;
+    }
+    .mail-list-panel {
+      background: linear-gradient(180deg, rgba(112,205,248,.92), rgba(105,190,240,.90));
+      border-radius: 24px;
+      box-shadow: 0 20px 40px rgba(93,184,243,.22), inset 0 0 0 1px rgba(255,255,255,.54);
+    }
+    .mail-count {
+      color: #FFFFFF;
+      text-shadow: none;
+      font-size: 18px;
+      letter-spacing: -.02em;
+    }
+    .mail-count b { color: #FFE76D; }
+    .starline {
+      background: linear-gradient(90deg, #FFE76D, rgba(255,231,109,.15));
+      height: 3px;
+    }
+    .starline::after { color: #FFE76D; }
+    .mail-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,.68); }
+    .mail-item {
+      background: rgba(255,255,255,.70);
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.78);
+      box-shadow: 0 8px 18px rgba(69,74,87,.06);
+    }
+    .mail-item.active {
+      border-color: #FFD756;
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 10px 22px rgba(255,199,74,.20), inset 0 0 0 1px rgba(255,231,109,.58);
+    }
+    .mail-icon {
+      background: linear-gradient(135deg, #F1F4FA, #E7ECF5);
+      color: #6F7B8D;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.7);
+    }
+    .mail-text h3 { color: var(--app-ink); font-weight: 900; }
+    .mail-text p { color: var(--app-muted); }
+    .game-btn {
+      border-radius: 14px;
+      font-size: 18px;
+      box-shadow: 0 10px 18px rgba(69,74,87,.10), inset 0 0 0 1px rgba(255,255,255,.52);
+    }
+    .game-btn.disabled {
+      background: linear-gradient(180deg, #F0F1F3, #D6D8DD);
+      color: #777D88;
+    }
+    .game-btn.green,
+    .game-btn.gold {
+      background: linear-gradient(180deg, #93E882, #51D971);
+      color: #2F6B38;
+    }
+    .game-btn.blue {
+      background: linear-gradient(180deg, #BCE8FF, #6EC7FF);
+      color: #2E6B92;
+    }
+    .detail-paper {
+      border-radius: 22px;
+      background:
+        radial-gradient(circle at 80% 70%, rgba(125,211,255,.14), transparent 24%),
+        rgba(255,255,255,.92);
+      box-shadow: inset 0 0 0 1px rgba(93,184,243,.20), 0 10px 26px rgba(69,74,87,.06);
+    }
+    .detail-paper::after { background: rgba(93,184,243,.08); }
+    .detail-head { border-bottom-color: var(--app-line); }
+    .detail-title { color: var(--app-ink); font-size: 26px; }
+    .detail-time,
+    .meta-row { color: var(--app-muted); }
+    .mail-body { color: #505665; }
+    .mail-body .hot { color: var(--app-orange); }
+    .attach-title {
+      background: linear-gradient(90deg, #D9F5FF, #EFFFFC);
+      color: #4B7487;
+      border-radius: 999px;
+      padding: 0 14px;
+      min-width: auto;
+    }
+    .media-copy { color: #66707D; }
+    .media-copy b { color: #4B7487; }
+    .attach-card {
+      border-radius: 22px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.42), 0 10px 20px rgba(69,74,87,.10);
+    }
+    .attach-card::after {
+      background: #6ECF80;
+      box-shadow: 0 4px 10px rgba(90,185,112,.24);
+    }
+
+    .detail-actions {
+      position: absolute;
+      right: 24px;
+      bottom: 24px;
+      display: flex;
+      gap: 12px;
+      z-index: 2;
+    }
+    .goto-mail {
+      min-width: 124px;
+      height: 44px;
+      border: 0;
+      border-radius: 14px;
+      background: linear-gradient(180deg, #FFC64A, #FFA12E);
+      color: #7B4B13;
+      font-size: 20px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 12px 20px rgba(255,166,46,.20), inset 0 0 0 1px rgba(255,255,255,.58);
+    }
+    .delete-mail {
+      border-radius: 14px;
+      background: linear-gradient(180deg, #93E882, #51D971);
+      color: #2F6B38;
+      box-shadow: 0 12px 20px rgba(81,217,113,.22), inset 0 0 0 1px rgba(255,255,255,.58);
+    }
+    .modal-mask, .preview-mask { background: rgba(50, 60, 76, .44); backdrop-filter: blur(6px); }
+    .confirm-modal {
+      background: rgba(255,255,255,.96);
+      color: var(--app-ink);
+      border: 1px solid rgba(255,255,255,.82);
+      box-shadow: 0 24px 70px rgba(69,74,87,.24);
+    }
+    .confirm-modal p { color: #747B88; }
+    .toast { background: rgba(69,74,87,.88); }
+    .phone-frame { box-shadow: 0 24px 70px rgba(69,74,87,.16); }
+    .phone-screen { background: #FFF8EC; }
+
+    /* Softer Zometool module palette: warm yellow + white cards */
+    body {
+      background:
+        radial-gradient(circle at 8% 8%, rgba(255,203,62,.22), transparent 22%),
+        linear-gradient(135deg, #FFF2CF, #FFF8EA 46%, #FFFDF8 100%);
+    }
+    .scene {
+      background:
+        linear-gradient(90deg, rgba(248,181,29,.08) 1px, transparent 1px) 0 0 / 176px 100%,
+        linear-gradient(0deg, rgba(248,181,29,.08) 1px, transparent 1px) 0 0 / 100% 116px,
+        radial-gradient(circle at 12% 83%, rgba(255,199,56,.16), transparent 8%),
+        radial-gradient(circle at 70% 14%, rgba(255,199,56,.10), transparent 12%),
+        linear-gradient(135deg, #FFF5DB 0%, #FFFAEF 44%, #FFFDF7 100%);
+    }
+    .top-title { color: #30333A; font-weight: 900; }
+    .back { color: #EF646A; filter: none; }
+    .nav { color: #777B85; }
+    .nav-line { border-left-color: rgba(122,126,135,.20); }
+    .nav-item { color: #747985; font-weight: 900; }
+    .nav-item.active {
+      color: #FFFFFF;
+      background: #8F7AE8;
+      border-radius: 18px;
+      box-shadow: 0 8px 20px rgba(143,122,232,.20);
+    }
+    .nav-item.active::before { color: #F195B0; }
+    .mail-shell {
+      background: rgba(255,255,255,.54);
+      border: 2px solid rgba(255,255,255,.82);
+      border-radius: 28px;
+      box-shadow: 0 18px 42px rgba(156,124,70,.10);
+    }
+    .mail-list-panel {
+      background: rgba(255,255,255,.78);
+      border: 2px solid rgba(255,255,255,.90);
+      border-radius: 28px;
+      box-shadow: 0 18px 42px rgba(156,124,70,.12);
+    }
+    .mail-count {
+      color: #4D515A;
+      font-size: 17px;
+      text-shadow: none;
+    }
+    .mail-count b { color: #F2A928; }
+    .starline { background: rgba(242,169,40,.26); }
+    .starline::after { color: #F2A928; }
+    .mail-item {
+      background: #FFFFFF;
+      border: 1px solid rgba(73,80,94,.07);
+      border-radius: 20px;
+      box-shadow: 0 10px 24px rgba(73,80,94,.07);
+    }
+    .mail-item.active {
+      background: #FFF9EA;
+      border-color: rgba(242,169,40,.54);
+      box-shadow: 0 12px 26px rgba(242,169,40,.15);
+    }
+    .mail-icon {
+      background: #F2F4FA;
+      color: #7A8290;
+    }
+    .mail-text h3 { color: #30333A; }
+    .mail-text p { color: #8A8F99; }
+    .detail-paper {
+      background: #FFFFFF;
+      border: 1px solid rgba(73,80,94,.07);
+      border-radius: 26px;
+      box-shadow: 0 14px 34px rgba(73,80,94,.08);
+    }
+    .detail-paper::after { background: rgba(70,165,236,.06); }
+    .detail-title { color: #30333A; }
+    .detail-head { border-bottom-color: rgba(73,80,94,.10); }
+    .detail-time, .meta-row { color: #8A8F99; }
+    .mail-body { color: #4D515A; }
+    .mail-body .hot { color: #E97846; }
+    .attach-title {
+      background: #EDF7FC;
+      color: #5D7180;
+      border-radius: 999px;
+    }
+    .media-copy { color: #757B86; }
+    .media-copy b { color: #5D7180; }
+    .attach-card {
+      border-radius: 24px;
+      box-shadow: 0 10px 22px rgba(73,80,94,.10);
+      filter: saturate(.82) brightness(1.03);
+    }
+    .attach-card::after { background: #68C65F; }
+    .game-btn,
+    .delete-mail,
+    .goto-mail {
+      border-radius: 18px;
+      font-weight: 900;
+      box-shadow: 0 10px 20px rgba(73,80,94,.10);
+    }
+    .game-btn.disabled {
+      background: #EDEEF1;
+      color: #787D86;
+    }
+    .game-btn.green,
+    .delete-mail {
+      background: #77CE69;
+      color: #FFFFFF;
+    }
+    .game-btn.gold,
+    .goto-mail {
+      background: #FFC640;
+      color: #FFFFFF;
+    }
+    .game-btn.blue { background: #8F7AE8; color: #FFFFFF; }
+    .confirm-modal {
+      background: #FFFFFF;
+      color: #30333A;
+      border: 1px solid rgba(73,80,94,.08);
+    }
+    .confirm-modal p { color: #757B86; }
+    .preview-box { filter: saturate(.82); }
+    .toast { background: rgba(48,51,58,.86); }
+
+    /* Zometool library/search style: clean blue-white and less crowded */
+    body {
+      background: #DFF5FF;
+    }
+    .scene {
+      background: #DDF6FF;
+    }
+    .scene::before,
+    .scene::after { display: none; }
+    .top-title {
+      left: 52px;
+      top: 26px;
+      font-size: 24px;
+      color: #30343B;
+    }
+    .back {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,.78);
+      color: #EE5E66;
+      font-size: 28px;
+    }
+    .nav {
+      left: 52px;
+      top: 100px;
+      width: 154px;
+      font-size: 18px;
+    }
+    .nav-line { display: none; }
+    .nav-item {
+      height: 54px;
+      margin-bottom: 14px;
+      border-radius: 16px;
+      color: #444B57;
+      padding: 0 18px;
+      background: rgba(255,255,255,.42);
+    }
+    .nav-item.active {
+      justify-content: flex-start;
+      padding: 0 18px;
+      color: #FFFFFF;
+      background: linear-gradient(135deg, #39C4F2, #5A7EFF);
+      border-radius: 18px;
+      box-shadow: 0 10px 22px rgba(58,151,239,.18);
+    }
+    .nav-item.active::before { display: none; }
+    .mail-shell {
+      left: 546px;
+      top: 76px;
+      width: 548px;
+      height: 420px;
+      padding: 12px;
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+    }
+    .mail-list-panel {
+      left: 224px;
+      top: 76px;
+      width: 296px;
+      height: 420px;
+      padding: 54px 12px 68px;
+      background: rgba(255,255,255,.62);
+      border: 1px solid rgba(255,255,255,.80);
+      border-radius: 26px;
+      box-shadow: 0 14px 32px rgba(59,128,168,.10);
+    }
+    .mail-count {
+      left: 18px;
+      top: 18px;
+      color: #454B56;
+      font-size: 16px;
+    }
+    .mail-count b { color: #2B9DF0; }
+    .starline { display: none; }
+    .mail-list { padding-right: 2px; }
+    .mail-list::-webkit-scrollbar { width: 4px; }
+    .mail-list::-webkit-scrollbar-thumb { background: rgba(67,152,212,.22); }
+    .mail-item {
+      min-height: 66px;
+      grid-template-columns: 44px minmax(0,1fr);
+      gap: 10px;
+      padding: 8px 12px;
+      margin-bottom: 8px;
+      border-radius: 18px;
+      background: #FFFFFF;
+      border: 0;
+      box-shadow: 0 8px 18px rgba(65,123,160,.07);
+    }
+    .mail-item.active {
+      background: #E9F6FF;
+      border: 2px solid #43A9F4;
+      box-shadow: 0 10px 22px rgba(67,169,244,.13);
+    }
+    .mail-icon {
+      width: 38px;
+      height: 38px;
+      font-size: 20px;
+      background: #F1F4F8;
+      color: #6D7480;
+    }
+    .mail-text h3 { font-size: 15px; color: #30343B; }
+    .mail-text p { font-size: 12px; color: #8A929E; }
+    .panel-actions {
+      left: 12px;
+      right: 12px;
+      bottom: 14px;
+      gap: 8px;
+    }
+    .game-btn {
+      height: 38px;
+      border-radius: 16px;
+      font-size: 15px;
+      box-shadow: none;
+    }
+    .game-btn.disabled { background: #ECEFF3; color: #7E858F; }
+    .game-btn.green,
+    .delete-mail { background: #56C96B; color: #FFFFFF; }
+    .game-btn.gold,
+    .goto-mail { background: #FFBE3D; color: #FFFFFF; }
+    .game-btn.blue { background: #EAF6FF; color: #338FD3; }
+    .detail-paper {
+      padding: 28px 28px 24px;
+      border-radius: 26px;
+      background: #FFFFFF;
+      border: 1px solid rgba(255,255,255,.88);
+      box-shadow: 0 14px 34px rgba(65,123,160,.09);
+    }
+    .detail-paper::after { display: none; }
+    .detail-head {
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(55,65,80,.10);
+    }
+    .detail-title { font-size: 24px; line-height: 1.28; color: #30343B; }
+    .detail-time { font-size: 14px; color: #89919C; }
+    .meta-row {
+      margin: 12px 0 10px;
+      font-size: 13px;
+      color: #89919C;
+    }
+    .mail-body {
+      font-size: 17px;
+      line-height: 1.5;
+      color: #4B515C;
+      max-height: 92px;
+    }
+    .media-block {
+      margin-top: 14px;
+      grid-template-columns: 128px 1fr;
+      gap: 16px;
+      max-width: 384px;
+    }
+    .attach-title {
+      height: 28px;
+      font-size: 14px;
+      background: #EAF6FF;
+      color: #338FD3;
+    }
+    .media-copy { font-size: 14px; color: #737B86; }
+    .media-copy b { color: #338FD3; }
+    .attach-card {
+      width: 88px;
+      height: 88px;
+      border-radius: 20px;
+      font-size: 36px;
+      filter: saturate(.76) brightness(1.04);
+      box-shadow: 0 8px 18px rgba(65,123,160,.10);
+    }
+    .media-block.batch { max-width: 392px; }
+    .media-block.batch .attach-card { width: 66px; height: 66px; font-size: 28px; }
+    .attach-card::after { width: 18px; height: 18px; font-size: 12px; }
+    .detail-actions {
+      right: 24px;
+      bottom: 22px;
+      gap: 10px;
+    }
+    .goto-mail,
+    .delete-mail {
+      min-width: 108px;
+      height: 40px;
+      border-radius: 16px;
+      font-size: 16px;
+      box-shadow: none;
+    }
+    .confirm-modal {
+      width: 380px;
+      border-radius: 24px;
+      box-shadow: 0 20px 50px rgba(65,123,160,.18);
+    }
+    .confirm-modal h3 { font-size: 20px; }
+    .confirm-modal p { font-size: 15px; }
+    .preview-box { width: 580px; height: 320px; }
+    .device-note { display: none; }
+    .phone-frame,
+    .phone-screen,
+    .screen-content .scene { border-radius: 0; box-shadow: none; }
+
+    /* Fixed target screen: 813 x 375 */
+    .phone-frame {
+      width: 813px;
+      height: 375px;
+      border-radius: 0;
+      overflow: hidden;
+    }
+    .phone-screen {
+      width: 813px;
+      height: 375px;
+      border-radius: 0;
+    }
+    .screen-content {
+      width: 1180px;
+      height: 560px;
+      transform: scale(.689);
+      transform-origin: left top;
+    }
+    .screen-content .scene {
+      width: 1180px;
+      height: 560px;
+      border-radius: 0;
+    }
+    @media (max-width: 900px) { .phone-frame { transform: scale(.96); } }
+    @media (max-width: 820px) { .phone-frame { transform: scale(.9); } }
+    @media (max-width: 1260px) { .phone-frame { transform: scale(.9); } }
+    @media (max-width: 1200px) { .phone-frame { transform: scale(.82); } }
+  </style>
+</head>
+<body>
+  <div class="device-note">Zometool APP 风格｜813×375 屏幕预览</div>
+  <div class="phone-frame"><div class="phone-screen"><div class="dynamic-island"></div><div class="screen-content">
+  <div class="scene">
+    <div class="top-title"><span class="back">↩</span><span>消息通知</span></div>
+    <div class="nav-line"></div>
+    <nav class="nav" id="nav">
+      <div class="nav-item active" data-tab="system">系统</div>
+      <div class="nav-item" data-tab="all">★ 全部</div>
+      <div class="nav-item" data-tab="feedback">★ 互动反馈</div>
+    </nav>
+
+    <section class="mail-shell">
+      <article class="detail-paper" id="detailPaper"></article>
+    </section>
+
+    <aside class="mail-list-panel">
+      <div class="mail-count">消息数：<b id="countText">0</b>/200</div>
+      <div class="starline"></div>
+      <div class="mail-list" id="mailList"></div>
+      <div class="panel-actions">
+        <button class="game-btn disabled" id="readAll">一键已读</button>
+        <button class="game-btn green" id="deleteRead">删除已读</button>
+      </div>
+    </aside>
+
+    <div class="modal-mask" id="confirmMask">
+      <div class="confirm-modal">
+        <h3>删除已读</h3>
+        <p>确定删除所有已读信息吗？</p>
+        <div class="confirm-actions">
+          <button class="game-btn blue" onclick="closeDeleteConfirm()">取消</button>
+          <button class="game-btn gold" onclick="confirmDeleteRead()">确定</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-mask" id="singleDeleteMask">
+      <div class="confirm-modal">
+        <h3>删除消息</h3>
+        <p>确定删除这条消息吗？删除后不可恢复。</p>
+        <div class="confirm-actions">
+          <button class="game-btn blue" onclick="closeSingleDeleteConfirm()">取消</button>
+          <button class="game-btn gold" onclick="confirmSingleDelete()">确定</button>
+        </div>
+      </div>
+    </div>
+    <div class="preview-mask" id="previewMask"><div class="preview-close" onclick="closePreview()">×</div><div class="preview-box" id="previewBox"></div></div>
+    <div class="toast" id="toast">已操作</div>
+  </div>
+  </div></div></div>
+
+<script>
+const messages = [
+  {id:1, tab:'system', unread:true, icon:'🎯', title:'新一期活动招募开始啦', text:'新一期拼搭活动正在招募中，点击去看看可查看活动规则和参与入口。', time:'刚刚', from:'系统 / UGC更新', valid:'29天'},
+  {id:2, tab:'system', unread:true, icon:'🖼️', title:'新作品集上线了', text:'官方新作品集已上线，收录多个优秀拼搭作品。', time:'8分钟前', from:'系统 / UGC更新', valid:'29天'},
+  {id:3, tab:'system', unread:true, icon:'📣', title:'你有一条新的营销信息', text:'限时活动信息已更新，点击去看看查看完整内容。', time:'16分钟前', from:'系统 / 营销信息', valid:'7天'},
+  {id:4, tab:'system', unread:true, icon:'🆕', title:'造型库上新了 36 个新造型', text:'本期造型库新增 36 个官方造型。列表仅展示代表造型，点击去看看查看完整上新列表。', time:'32分钟前', from:'系统 / 造型库', valid:'30天', batch:true, attach:[['🏗️','天空塔','#4B6BFF'],['🌉','三角桥','#22B573'],['🎡','摩天轮','#FF9D2E'],['🚀','火箭站','#7657FF']]},
+  {id:5, tab:'system', unread:true, icon:'🔧', title:'造型库功能模块更新', text:'造型库新增筛选和主题合集入口，可以更快找到想拼的造型。', time:'1小时前', from:'系统 / 造型库', valid:'30天'},
+  {id:6, tab:'system', unread:false, icon:'📚', title:'新课程上线了', text:'新的 Zometool 课程已上线，点击可查看课程详情。', time:'2小时前', from:'系统 / 课程', valid:'30天'},
+  {id:7, tab:'system', unread:false, icon:'⚠️', title:'作品暂未通过审核', text:'不通过原因：作品封面不清晰，无法准确展示拼搭主体。请重新上传清晰封面后再提交审核。', time:'今天 10:24', from:'系统 / 作品圈', valid:'永久', image:['🏗️','linear-gradient(135deg,#FF9D2E,#FFE08A)'], imageLabel:'作品图'},
+  {id:8, tab:'system', unread:false, icon:'🏅', title:'你获得了 V 标', text:'恭喜你获得 V 标，你的主页已展示新的身份标识。', time:'昨天 18:30', from:'系统 / 成就', valid:'永久'},
+  {id:9, tab:'system', unread:false, icon:'🎁', title:'造型被收藏入库', text:'你的造型已被收藏入官方入库列表，后续可能被更多用户看到。', time:'昨天 16:12', from:'系统 / 成就', valid:'永久', image:['🌉','linear-gradient(135deg,#22B573,#B8F2D4)'], imageLabel:'造型图'},
+
+  {id:10, tab:'feedback', unread:true, icon:'⭐', title:'你的造型被收藏了 9 次', text:'你的入库造型被收藏了 9 次。收藏反馈按造型聚合展示。', time:'昨天 14:05', from:'互动反馈 / 造型库', valid:'永久', image:['🏛️','linear-gradient(135deg,#FF9D2E,#FFE08A)'], imageLabel:'造型图'},
+  {id:11, tab:'feedback', unread:false, icon:'🧱', title:'有人跟拼了你的造型', text:'你的入库造型有 3 个新的跟拼作品，点击可查看跟拼列表。', time:'昨天 11:40', from:'互动反馈 / 造型库', valid:'永久', image:['🌉','linear-gradient(135deg,#22B573,#B8F2D4)'], imageLabel:'造型图'},
+  {id:12, tab:'feedback', unread:false, icon:'🔁', title:'你的造型被分享了 15 次', text:'你的入库造型被分享了 15 次。分享消息按造型聚合。', time:'上周五', from:'互动反馈 / 造型库', valid:'永久', image:['🏗️','linear-gradient(135deg,#F7971E,#FFD200)'], imageLabel:'造型图'},
+  {id:13, tab:'feedback', unread:false, icon:'💎', title:'跟拼作品被收藏了 6 次', text:'你的跟拼作品【星际直升机】被收藏了 6 次。', time:'上周五', from:'互动反馈 / 造型库', valid:'永久', image:['🛰️','linear-gradient(135deg,#2D74C4,#9FD8FF)'], imageLabel:'作品图'},
+  {id:14, tab:'feedback', unread:false, icon:'👍', title:'跟拼作品被点赞了 24 次', text:'你的跟拼作品【星际直升机】收到了 24 个赞。', time:'上周五', from:'互动反馈 / 造型库', valid:'永久', image:['🧩','linear-gradient(135deg,#11998E,#38EF7D)'], imageLabel:'作品图'},
+  {id:15, tab:'feedback', unread:false, icon:'🔁', title:'跟拼作品被分享了 8 次', text:'你的跟拼作品【星际直升机】被分享了 8 次。', time:'上周四', from:'互动反馈 / 造型库', valid:'永久', image:['🕊️','linear-gradient(135deg,#7657FF,#E6B8FF)'], imageLabel:'作品图'},
+  {id:16, tab:'feedback', unread:false, icon:'🏆', title:'跟拼作品收到了夸一夸', text:'你的跟拼作品【星际直升机】收到了夸一夸：这个结构很稳，配色也很漂亮！', time:'上周三', from:'互动反馈 / 造型库', valid:'永久', image:['🏆','linear-gradient(135deg,#FF7A59,#FFD166)'], imageLabel:'作品图'},
+  {id:17, tab:'feedback', unread:false, icon:'💬', title:'共创达人评论了你的跟拼作品', text:'共创达人评论了你的跟拼作品【星际直升机】：这个角度处理得很好，可以试试加高底座。', time:'上周三', from:'互动反馈 / 造型库', valid:'永久', image:['🛠️','linear-gradient(135deg,#8E2DE2,#4A00E0)'], imageLabel:'作品图'},
+  {id:18, tab:'feedback', unread:true, icon:'👍', title:'你的作品收到了 18 个赞', text:'你的作品【夏日摩天轮】收到了 18 个赞。', time:'上周二', from:'互动反馈 / 作品圈', valid:'永久', image:['🚀','linear-gradient(135deg,#4B6BFF,#88D8FF)'], imageLabel:'作品图'},
+  {id:19, tab:'feedback', unread:false, icon:'⭐', title:'你的作品被收藏了 12 次', text:'你的作品【夏日摩天轮】被收藏了 12 次。', time:'上周二', from:'互动反馈 / 作品圈', valid:'永久', image:['🛰️','linear-gradient(135deg,#2D74C4,#9FD8FF)'], imageLabel:'作品图'},
+  {id:20, tab:'feedback', unread:false, icon:'🔁', title:'你的作品被分享了 6 次', text:'你的作品【夏日摩天轮】被分享了 6 次。', time:'上周一', from:'互动反馈 / 作品圈', valid:'永久', image:['🕊️','linear-gradient(135deg,#7657FF,#E6B8FF)'], imageLabel:'作品图'},
+  {id:21, tab:'feedback', unread:false, icon:'🏆', title:'你的作品收到了夸一夸', text:'你的作品【夏日摩天轮】收到了夸一夸：这件作品太有创意了！', time:'上周一', from:'互动反馈 / 作品圈', valid:'永久', image:['🏆','linear-gradient(135deg,#FF7A59,#FFD166)'], imageLabel:'作品图'},
+  {id:22, tab:'feedback', unread:false, icon:'💬', title:'共创达人评论了你的作品', text:'共创达人评论了你的作品【夏日摩天轮】：结构很稳定，顶部造型也很有创意！', time:'上周一', from:'互动反馈 / 作品圈', valid:'永久', image:['🚀','linear-gradient(135deg,#4B6BFF,#88D8FF)'], imageLabel:'作品图'},
+  {id:23, tab:'feedback', unread:false, icon:'👥', title:'你有新的粉丝', text:'安安、木木等 5 人关注了你。新增粉丝可在 30 分钟内聚合。', time:'上周一', from:'互动反馈 / 作品圈', valid:'永久'}
+];
+let currentTab = 'system';
+let currentId = 1;
+const mailList = document.getElementById('mailList');
+const detailPaper = document.getElementById('detailPaper');
+const countText = document.getElementById('countText');
+const toast = document.getElementById('toast');
+const confirmMask = document.getElementById('confirmMask');
+const singleDeleteMask = document.getElementById('singleDeleteMask');
+const previewMask = document.getElementById('previewMask');
+const previewBox = document.getElementById('previewBox');
+function filtered(){ return currentTab === 'all' ? messages : messages.filter(m => m.tab === currentTab); }
+function ensureCurrent(){ const data = filtered(); if(!data.find(m => m.id === currentId)) currentId = (data.find(m=>m.unread) || data[0] || {}).id; }
+function render(){
+  ensureCurrent();
+  const data = filtered();
+  countText.textContent = messages.length;
+  mailList.innerHTML = data.map(m => `<div class="mail-item ${m.id===currentId?'active':''}" onclick="selectMail(${m.id})"><div class="mail-icon ${m.gift?'gift':''}">${m.icon}</div><div class="mail-text"><h3>${m.title}</h3><p>${m.time}</p></div></div>`).join('') || '<div style="color:#fff;font-weight:900;text-align:center;margin-top:80px;">暂无消息</div>';
+  renderDetail();
+}
+function renderDetail(){
+  const m = messages.find(x => x.id === currentId);
+  if(!m){ detailPaper.innerHTML = '<div style="display:grid;place-items:center;height:100%;font-size:22px;color:#7f8798;font-weight:900;">暂无消息</div>'; return; }
+  const img = m.image ? `<div class="media-block"><div><div class="attach-title">🔗 ${m.imageLabel || '展示图'}</div><div class="attachments"><div class="attach-card" style="background:${m.image[1]}" onclick="openPreview('${m.image[0]}','${m.title.replace(/'/g,"\\'")}','${m.image[1]}')">${m.image[0]}</div></div></div><div class="media-copy"><b>点击图片可放大预览</b><br>用于补充识别具体作品或造型。</div></div>` : '';
+  const attach = m.attach ? `<div class="media-block batch"><div class="attach-title">🔗 代表造型</div><div class="attachments">${m.attach.map(a=>`<div class="attach-card" style="background:${a[2]}">${a[0]}<span>${a[1]}</span></div>`).join('')}</div><div class="media-copy"><b>仅展示部分代表造型</b>，完整上新列表点击去看看查看。</div></div>` : '';
+  const canGo = m.tab === 'system' || /跟拼|评论|夸一夸|粉丝|收藏|点赞|分享/.test(m.title);
+  const actionText = m.title.includes('暂未通过审核') ? '去修改' : '去看看';
+  const action = canGo ? `<button class="goto-mail" onclick="goViewCurrent()">${actionText}</button>` : '';
+  detailPaper.innerHTML = `<div class="detail-head"><h2 class="detail-title">${m.title}</h2><div class="detail-time">${m.time}</div></div><div class="meta-row"><span>来自：${m.from}</span><span>保留：${m.valid}</span></div><div class="mail-body">${m.text.replace(/不通过原因|夸一夸内容|共创达人评论/g, '<span class="hot">$&</span>')}</div>${img || attach}<div class="detail-actions">${action}<button class="delete-mail" onclick="openSingleDeleteConfirm()">删除消息</button></div>`;
+}
+function selectMail(id){ currentId = id; const m = messages.find(x=>x.id===id); if(m) m.unread=false; render(); }
+function deleteCurrent(){ const idx = messages.findIndex(m=>m.id===currentId); if(idx>=0) messages.splice(idx,1); currentId = (filtered()[0]||messages[0]||{}).id; render(); showToast('消息已删除'); }
+function openSingleDeleteConfirm(){ singleDeleteMask.classList.add('show'); }
+function closeSingleDeleteConfirm(){ singleDeleteMask.classList.remove('show'); }
+function confirmSingleDelete(){ closeSingleDeleteConfirm(); deleteCurrent(); }
+function showToast(t){ toast.textContent=t; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'),1200); }
+function goViewCurrent(){ const m = messages.find(x=>x.id===currentId); showToast(m && m.title.includes('暂未通过审核') ? '进入修改页' : '进入查看页'); }
+function openPreview(icon,title,bg){ previewBox.textContent=icon; previewBox.dataset.title=title; previewBox.style.background=bg; previewMask.classList.add('show'); }
+function closePreview(){ previewMask.classList.remove('show'); }
+function closeDeleteConfirm(){ confirmMask.classList.remove('show'); }
+function confirmDeleteRead(){ for(let i=messages.length-1;i>=0;i--){ if(!messages[i].unread) messages.splice(i,1); } closeDeleteConfirm(); currentId=(filtered().find(m=>m.unread)||filtered()[0]||messages[0]||{}).id; render(); showToast('已删除已读消息'); }
+document.getElementById('readAll').onclick = () => { messages.forEach(m=>m.unread=false); render(); showToast('已全部标记已读'); };
+document.getElementById('deleteRead').onclick = () => confirmMask.classList.add('show');
+document.querySelectorAll('.nav-item').forEach(n => n.onclick = () => { currentTab=n.dataset.tab; document.querySelectorAll('.nav-item').forEach(x=>x.classList.toggle('active',x===n)); currentId=(filtered().find(m=>m.unread)||filtered()[0]||{}).id; render(); });
+confirmMask.onclick = e => { if(e.target===confirmMask) closeDeleteConfirm(); };
+singleDeleteMask.onclick = e => { if(e.target===singleDeleteMask) closeSingleDeleteConfirm(); };
+previewMask.onclick = e => { if(e.target===previewMask) closePreview(); };
+render();
+</script>
+</body>
+</html>
