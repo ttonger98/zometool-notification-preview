@@ -879,6 +879,12 @@
     .game-btn.gold,
     .goto-mail { background: #FFBE3D; color: #FFFFFF; }
     .game-btn.blue { background: #EAF6FF; color: #338FD3; }
+
+    .game-btn.read-active {
+      background: #2E9BEF !important;
+      color: #FFFFFF !important;
+      box-shadow: 0 8px 18px rgba(46,155,239,.18) !important;
+    }
     .detail-paper {
       padding: 28px 28px 24px;
       border-radius: 26px;
@@ -1293,6 +1299,133 @@
       .goto-mail, .delete-mail { height: 31px !important; min-width: 82px !important; border-radius: 11px !important; font-size: 12px !important; }
     }
 
+    @media (max-width: 700px), (max-height: 360px) {
+      .mail-list-panel {
+        left: 112px !important;
+        width: min(230px, 36vw) !important;
+        top: 40px !important;
+        height: calc(var(--app-height, 100dvh) - 48px) !important;
+        padding: 38px 7px 44px !important;
+      }
+      .mail-shell {
+        left: calc(112px + min(230px, 36vw) + 8px) !important;
+        right: 8px !important;
+        top: 40px !important;
+        height: calc(var(--app-height, 100dvh) - 48px) !important;
+      }
+      .nav { width: 88px !important; font-size: 12px !important; }
+      .nav-item { height: 34px !important; padding: 0 9px !important; margin-bottom: 7px !important; }
+      .detail-paper {
+        padding: 12px 12px 44px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        min-width: 0 !important;
+      }
+      .detail-head {
+        grid-template-columns: minmax(0,1fr) auto !important;
+        gap: 8px !important;
+        padding-bottom: 7px !important;
+      }
+      .detail-title {
+        font-size: clamp(14px, 4.3vw, 17px) !important;
+        line-height: 1.18 !important;
+        min-width: 0 !important;
+      }
+      .detail-time { font-size: 10px !important; }
+      .meta-row { margin: 6px 0 5px !important; font-size: 10px !important; }
+      .mail-body {
+        font-size: clamp(11px, 3.45vw, 13px) !important;
+        line-height: 1.34 !important;
+        max-height: 48px !important;
+        margin-top: 4px !important;
+      }
+      .media-block {
+        margin-top: 8px !important;
+        grid-template-columns: minmax(58px, 74px) minmax(0,1fr) !important;
+        gap: 8px !important;
+        max-width: 100% !important;
+        align-items: center !important;
+      }
+      .media-block.batch {
+        max-width: 100% !important;
+      }
+      .attachments { gap: 6px !important; }
+      .attach-title {
+        min-width: 0 !important;
+        max-width: 108px !important;
+        height: 21px !important;
+        padding: 0 8px !important;
+        font-size: 10px !important;
+        margin-bottom: 5px !important;
+      }
+      .attach-card {
+        width: 48px !important;
+        height: 48px !important;
+        border-radius: 12px !important;
+        font-size: 20px !important;
+      }
+      .media-block.batch .attach-card {
+        width: 42px !important;
+        height: 42px !important;
+        font-size: 18px !important;
+      }
+      .attach-card::after { width: 14px !important; height: 14px !important; font-size: 9px !important; right: -3px !important; top: -4px !important; }
+      .attach-card span { font-size: 9px !important; right: 3px !important; }
+      .media-copy {
+        font-size: 10px !important;
+        line-height: 1.24 !important;
+        min-width: 0 !important;
+      }
+      .activity-banner {
+        margin-top: 8px !important;
+        min-height: 68px !important;
+        padding: 9px 10px !important;
+        border-radius: 15px !important;
+        gap: 8px !important;
+        grid-template-columns: minmax(0,1fr) 42px !important;
+      }
+      .banner-label { font-size: 9px !important; padding: 2px 6px !important; }
+      .banner-copy b { font-size: 13px !important; line-height: 1.14 !important; }
+      .banner-copy span { font-size: 10px !important; line-height: 1.22 !important; }
+      .banner-icon { width: 42px !important; height: 42px !important; border-radius: 13px !important; font-size: 22px !important; }
+      .detail-actions {
+        right: 12px !important;
+        bottom: 10px !important;
+        gap: 7px !important;
+      }
+      .goto-mail,
+      .delete-mail {
+        height: 28px !important;
+        min-width: 70px !important;
+        padding: 0 10px !important;
+        border-radius: 10px !important;
+        font-size: 11px !important;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .top-title { left: 10px !important; top: 8px !important; font-size: 16px !important; }
+      .back { width: 28px !important; height: 28px !important; font-size: 18px !important; }
+      .nav { display: none !important; }
+      .mail-list-panel {
+        left: 8px !important;
+        width: 35vw !important;
+        min-width: 168px !important;
+      }
+      .mail-shell {
+        left: calc(8px + max(35vw, 168px) + 8px) !important;
+        right: 8px !important;
+      }
+      .list-title { font-size: 14px !important; left: 11px !important; }
+      .count-pill { font-size: 9px !important; right: 9px !important; }
+      .mail-item { min-height: 43px !important; grid-template-columns: 27px minmax(0,1fr) !important; padding: 5px 6px !important; }
+      .mail-icon { width: 26px !important; height: 26px !important; font-size: 14px !important; }
+      .mail-text h3 { font-size: 10px !important; }
+      .mail-text p { font-size: 9px !important; }
+      .game-btn { height: 27px !important; font-size: 10px !important; }
+    }
+
+
     /* Read/unread visual states */
     .mail-item.unread {
       background: #FFFFFF !important;
@@ -1399,9 +1532,17 @@
       opacity: 1 !important;
     }
     .mail-item.active {
-      border-color: #2B9DF0 !important;
-      box-shadow: 0 12px 26px rgba(43,157,240,.18) !important;
+      border: 2px solid #2B9DF0 !important;
+      outline: 2px solid rgba(43,157,240,.24) !important;
+      outline-offset: -5px !important;
+      box-shadow: 0 12px 26px rgba(43,157,240,.20) !important;
       opacity: 1 !important;
+    }
+    .mail-item.active.read,
+    .mail-item.active.unread {
+      border: 2px solid #2B9DF0 !important;
+      outline: 2px solid rgba(43,157,240,.24) !important;
+      outline-offset: -5px !important;
     }
 
     /* Remove unread left blue bar */
@@ -1496,6 +1637,7 @@ const mailList = document.getElementById('mailList');
 const detailPaper = document.getElementById('detailPaper');
 const countText = document.getElementById('countText');
 const toast = document.getElementById('toast');
+const readAllButton = document.getElementById('readAll');
 const confirmMask = document.getElementById('confirmMask');
 const singleDeleteMask = document.getElementById('singleDeleteMask');
 const previewMask = document.getElementById('previewMask');
@@ -1527,7 +1669,10 @@ function ensureCurrent(){ const data = filtered(); if(!data.find(m => m.id === c
 function render(){
   ensureCurrent();
   const data = filtered();
+  const unreadCount = data.filter(m=>m.unread).length;
   countText.textContent = `${data.filter(m=>!m.unread).length}/${data.length}`;
+  readAllButton.classList.toggle('disabled', unreadCount === 0);
+  readAllButton.classList.toggle('read-active', unreadCount > 0);
   mailList.innerHTML = data.map(m => `<div class="mail-item ${m.id===currentId?'active':''} ${m.unread?'unread':'read'}" onclick="selectMail(${m.id})"><div class="mail-icon ${m.gift?'gift':''}">${m.icon}</div><div class="mail-text"><h3>${m.title}</h3><p>${m.time}</p></div></div>`).join('') || '<div style="color:#fff;font-weight:900;text-align:center;margin-top:80px;">暂无消息</div>';
   renderDetail();
 }
@@ -1570,7 +1715,7 @@ function openPreview(icon,title,bg){ previewBox.textContent=icon; previewBox.dat
 function closePreview(){ previewMask.classList.remove('show'); }
 function closeDeleteConfirm(){ confirmMask.classList.remove('show'); }
 function confirmDeleteRead(){ const readIds = messages.filter(m=>!m.unread).map(m=>m.id); for(let i=messages.length-1;i>=0;i--){ if(!messages[i].unread) messages.splice(i,1); } Object.keys(sessionOrder).forEach(tab=>{ sessionOrder[tab] = sessionOrder[tab].filter(id=>!readIds.includes(id)); }); closeDeleteConfirm(); currentId=(filtered().find(m=>m.unread)||filtered()[0]||messages[0]||{}).id; render(); showToast('已删除已读消息'); }
-document.getElementById('readAll').onclick = () => { messages.forEach(m=>m.unread=false); render(); showToast('已全部标记已读'); };
+document.getElementById('readAll').onclick = () => { const data = tabMessages(currentTab); if(!data.some(m=>m.unread)){ showToast('当前没有未读消息'); return; } data.forEach(m=>m.unread=false); render(); showToast('已全部标记已读'); };
 document.getElementById('deleteRead').onclick = () => confirmMask.classList.add('show');
 document.querySelectorAll('.nav-item').forEach(n => n.onclick = () => { currentTab=n.dataset.tab; refreshTabOrder(currentTab); document.querySelectorAll('.nav-item').forEach(x=>x.classList.toggle('active',x===n)); currentId=(filtered().find(m=>m.unread)||filtered()[0]||{}).id; render(); });
 confirmMask.onclick = e => { if(e.target===confirmMask) closeDeleteConfirm(); };
