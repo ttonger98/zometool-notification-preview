@@ -2232,14 +2232,14 @@
     @media (orientation: landscape) and (max-height: 520px) {
       :root {
         --land-left-safe: max(72px, env(safe-area-inset-left));
-        --land-right-safe: 14px;
+        --land-right-safe: 24px;
         --tab-w: 116px;
-        --detail-w: 42.5vw;
+        --detail-w: 42vw;
         --gap: 7px;
         --list-w: calc(100vw - var(--land-left-safe) - var(--tab-w) - var(--detail-w) - var(--land-right-safe) - (var(--gap) * 2));
       }
       .mail-list-panel {
-        width: min(var(--list-w), 318px) !important;
+        width: min(var(--list-w), 302px) !important;
         padding: 14px 8px 42px !important;
       }
       .mail-shell {
