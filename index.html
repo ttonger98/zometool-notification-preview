@@ -2123,7 +2123,7 @@
         --land-right-safe: max(14px, env(safe-area-inset-right));
         --tab-w: 118px;
         --gap: 10px;
-        --detail-w: 49vw;
+        --detail-w: 44vw;
         --list-w: calc(100vw - var(--land-left-safe) - var(--tab-w) - var(--detail-w) - var(--land-right-safe) - (var(--gap) * 2));
       }
       .nav {
@@ -2232,15 +2232,15 @@
     @media (orientation: landscape) and (max-height: 520px) {
       :root {
         --land-left-safe: max(72px, env(safe-area-inset-left));
-        --land-right-safe: max(8px, env(safe-area-inset-right));
+        --land-right-safe: 0px;
         --tab-w: 116px;
-        --detail-w: 46vw;
-        --gap: 14px;
+        --detail-w: 41.5vw;
+        --gap: 7px;
         --list-w: calc(100vw - var(--land-left-safe) - var(--tab-w) - var(--detail-w) - var(--land-right-safe) - (var(--gap) * 2));
       }
       .mail-list-panel {
-        width: clamp(210px, var(--list-w), 290px) !important;
-        padding: 14px 10px 42px !important;
+        width: min(var(--list-w), 370px) !important;
+        padding: 14px 8px 42px !important;
       }
       .mail-shell {
         width: var(--detail-w) !important;
@@ -2260,7 +2260,7 @@
         font-size: 15px !important;
       }
       .mail-text h3 {
-        font-size: 12px !important;
+        font-size: 11.5px !important;
         line-height: 1.18 !important;
       }
       .mail-text p {
@@ -2269,7 +2269,7 @@
         margin-top: 2px !important;
       }
       .detail-title {
-        font-size: 18px !important;
+        font-size: 17px !important;
         line-height: 1.22 !important;
       }
       .mail-body {
