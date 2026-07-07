@@ -2232,14 +2232,14 @@
     @media (orientation: landscape) and (max-height: 520px) {
       :root {
         --land-left-safe: max(72px, env(safe-area-inset-left));
-        --land-right-safe: 8px;
+        --land-right-safe: 14px;
         --tab-w: 116px;
         --detail-w: 42.5vw;
         --gap: 7px;
         --list-w: calc(100vw - var(--land-left-safe) - var(--tab-w) - var(--detail-w) - var(--land-right-safe) - (var(--gap) * 2));
       }
       .mail-list-panel {
-        width: min(var(--list-w), 350px) !important;
+        width: min(var(--list-w), 318px) !important;
         padding: 14px 8px 42px !important;
       }
       .mail-shell {
@@ -2260,7 +2260,7 @@
         font-size: 15px !important;
       }
       .mail-text h3 {
-        font-size: 11.5px !important;
+        font-size: 11px !important;
         line-height: 1.18 !important;
       }
       .mail-text p {
@@ -2352,7 +2352,7 @@ const messages = [
   {id:8, sort:120, tab:'system', unread:false, icon:'🏅', title:'你获得了 V 标', text:'恭喜你获得 V 标，你的主页已展示新的身份标识。', time:'06/12', from:'成就', valid:'永久'},
   {id:3, sort:22, tab:'system', unread:false, icon:'🎁', title:'恭喜！你的造型入选官方造型库啦！', text:'恭喜你！你的造型【水晶城堡】已被官方选中入库。感谢你的精彩创作，它将出现在造型库中，为更多用户提供跟拼参考。快去看看吧！', time:'2025/12/29', from:'Zometool官方', valid:'永久', entry:true, attach:[['🏰','水晶城堡','#69B7FF']]},
 
-  {id:9, sort:20, tab:'system', unread:false, icon:'🎁', title:'恭喜！你有 3 个造型入选官方造型库！', text:'恭喜你！你的 3 个造型已被官方选中入库。感谢你持续带来精彩创作，它们将出现在造型库中，为更多用户提供跟拼参考。快去看看吧！', time:'2025/12/28', from:'Zometool官方', valid:'永久', entry:true, attach:[['🌉','三角桥','#22B573'],['🏗️','天空塔','#4B6BFF'],['🌌','星轨门','#5E72E4']]},
+  {id:9, sort:20, tab:'system', unread:false, icon:'🎁', title:'恭喜！你有3个造型入选官方造型库！', text:'恭喜你！你有3个造型已被官方选中入库。感谢你持续带来精彩创作，它们将出现在造型库中，为更多用户提供跟拼参考。快去看看吧！', time:'2025/12/28', from:'Zometool官方', valid:'永久', entry:true, attach:[['🌉','三角桥','#22B573'],['🏗️','天空塔','#4B6BFF'],['🌌','星轨门','#5E72E4']]},
 
   {id:25, sort:2292, tab:'feedback', unread:true, icon:'⭐', title:'有人收藏了你的造型', text:'安安收藏了你的造型【古典剧院】。', time:'刚刚', from:'造型库', valid:'永久', image:['🏛️','linear-gradient(135deg,#FF9D2E,#FFE08A)'], imageLabel:'造型图', users:[['安安','安','#FF9D2E']]},
   {id:10, sort:2290, tab:'feedback', unread:true, icon:'⭐', title:'有 9 个人收藏了你的造型', text:'安安和其他 8 个用户收藏了你的造型【古典剧院】。', time:'刚刚', from:'造型库', valid:'永久', image:['🏛️','linear-gradient(135deg,#FF9D2E,#FFE08A)'], imageLabel:'造型图', users:[['安安','安','#FF9D2E'],['小宇','宇','#4B6BFF'],['乐乐','乐','#22B573'],['豆豆','豆','#7657FF'],['可可','可','#FF7A59'],['木木','木','#12B3A8'],['天天','天','#2D74C4'],['橙子','橙','#F7971E'],['小石头','石','#7657FF']]},
