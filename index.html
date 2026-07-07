@@ -1993,6 +1993,210 @@
       }
     }
 
+
+    /* PWA iPhone landscape safe-area final guard */
+    @media (orientation: landscape) and (max-height: 520px) {
+      :root {
+        --land-left-safe: max(76px, env(safe-area-inset-left));
+        --land-right-safe: max(34px, env(safe-area-inset-right));
+        --tab-w: 62px;
+        --list-w: clamp(158px, 22vw, 190px);
+        --gap: 10px;
+      }
+      .top-title {
+        left: var(--land-left-safe) !important;
+        top: 10px !important;
+        font-size: 18px !important;
+      }
+      .back {
+        width: 30px !important;
+        height: 30px !important;
+        font-size: 20px !important;
+      }
+      .nav {
+        display: block !important;
+        left: var(--land-left-safe) !important;
+        top: 50px !important;
+        width: var(--tab-w) !important;
+        font-size: 10px !important;
+      }
+      .nav-item {
+        height: 30px !important;
+        margin-bottom: 7px !important;
+        padding: 0 6px !important;
+        border-radius: 10px !important;
+      }
+      .tab-badge {
+        min-width: 15px !important;
+        height: 15px !important;
+        padding: 0 4px !important;
+        font-size: 9px !important;
+      }
+      .mail-list-panel {
+        left: calc(var(--land-left-safe) + var(--tab-w) + var(--gap)) !important;
+        top: 44px !important;
+        width: var(--list-w) !important;
+        min-width: 0 !important;
+        height: calc(var(--app-height, 100dvh) - 54px) !important;
+        padding: 14px 7px 42px !important;
+        border-radius: 18px !important;
+        overflow: hidden !important;
+      }
+      .mail-shell {
+        left: calc(var(--land-left-safe) + var(--tab-w) + var(--gap) + var(--list-w) + var(--gap)) !important;
+        right: var(--land-right-safe) !important;
+        top: 44px !important;
+        height: calc(var(--app-height, 100dvh) - 54px) !important;
+        width: auto !important;
+        max-width: none !important;
+        overflow: hidden !important;
+        border-radius: 22px !important;
+      }
+      .detail-paper {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 14px 14px 54px !important;
+        border-radius: 22px !important;
+        overflow: hidden !important;
+      }
+      .mail-item {
+        min-height: 40px !important;
+        grid-template-columns: 26px minmax(0,1fr) !important;
+        gap: 6px !important;
+        padding: 5px 6px !important;
+        border-radius: 13px !important;
+      }
+      .mail-icon { width: 25px !important; height: 25px !important; font-size: 13px !important; }
+      .mail-text h3 { font-size: 10px !important; line-height: 1.15 !important; }
+      .mail-text p { font-size: 8px !important; margin-top: 2px !important; }
+      .panel-actions {
+        left: 7px !important;
+        right: 7px !important;
+        bottom: 7px !important;
+        gap: 6px !important;
+        display: grid !important;
+        grid-template-columns: minmax(0,1fr) minmax(0,1fr) !important;
+      }
+      .game-btn {
+        width: 100% !important;
+        min-width: 0 !important;
+        height: 28px !important;
+        padding: 0 6px !important;
+        font-size: 10px !important;
+        border-radius: 10px !important;
+        white-space: nowrap !important;
+      }
+      .detail-actions {
+        left: 14px !important;
+        right: 14px !important;
+        bottom: 10px !important;
+        display: grid !important;
+        grid-template-columns: minmax(0,1fr) minmax(0,1fr) !important;
+        gap: 7px !important;
+        z-index: 4 !important;
+      }
+      .goto-mail,
+      .delete-mail {
+        width: 100% !important;
+        min-width: 0 !important;
+        height: 30px !important;
+        padding: 0 6px !important;
+        font-size: 11px !important;
+        border-radius: 11px !important;
+        white-space: nowrap !important;
+      }
+      .followup-gallery,
+      .avatar-strip,
+      .media-block.batch,
+      .activity-banner {
+        left: 14px !important;
+        right: 14px !important;
+        bottom: 50px !important;
+      }
+    }
+
+
+    /* Final landscape proportions: tabs single-line, detail exactly half screen */
+    @media (orientation: landscape) and (max-height: 520px) {
+      :root {
+        --land-left-safe: max(70px, env(safe-area-inset-left));
+        --land-right-safe: max(14px, env(safe-area-inset-right));
+        --tab-w: 118px;
+        --gap: 10px;
+        --detail-w: 49vw;
+        --list-w: calc(100vw - var(--land-left-safe) - var(--tab-w) - var(--detail-w) - var(--land-right-safe) - (var(--gap) * 2));
+      }
+      .nav {
+        left: var(--land-left-safe) !important;
+        width: var(--tab-w) !important;
+        font-size: 13px !important;
+      }
+      .nav-item {
+        justify-content: flex-start !important;
+        white-space: nowrap !important;
+        flex-wrap: nowrap !important;
+        overflow: visible !important;
+        gap: 4px !important;
+        padding: 0 8px !important;
+      }
+      .nav-item.active { justify-content: flex-start !important; }
+      .tab-label {
+        display: inline-block !important;
+        white-space: nowrap !important;
+        word-break: keep-all !important;
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+        overflow: visible !important;
+        text-overflow: clip !important;
+      }
+      .tab-badge {
+        position: absolute !important;
+        right: 5px !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        flex: none !important;
+        margin-left: 0 !important;
+      }
+      .nav-item .tab-label { padding-right: 22px !important; }
+      .mail-list-panel {
+        left: calc(var(--land-left-safe) + var(--tab-w) + var(--gap)) !important;
+        width: max(180px, var(--list-w)) !important;
+      }
+      .mail-shell {
+        left: auto !important;
+        right: var(--land-right-safe) !important;
+        width: var(--detail-w) !important;
+        max-width: var(--detail-w) !important;
+      }
+    }
+
+
+    /* Detail actions: short buttons, right aligned like the list actions */
+    @media (orientation: landscape) and (max-height: 520px) {
+      .detail-actions {
+        left: auto !important;
+        right: 14px !important;
+        bottom: 10px !important;
+        display: flex !important;
+        justify-content: flex-end !important;
+        align-items: center !important;
+        gap: 8px !important;
+        width: auto !important;
+        max-width: calc(100% - 28px) !important;
+      }
+      .goto-mail,
+      .delete-mail {
+        width: 86px !important;
+        min-width: 86px !important;
+        max-width: 86px !important;
+        height: 30px !important;
+        padding: 0 8px !important;
+        font-size: 11px !important;
+        border-radius: 11px !important;
+        white-space: nowrap !important;
+      }
+    }
+
     /* Remove unread left blue bar */
     .mail-item.unread::before { display: none !important; }
 
@@ -2205,12 +2409,17 @@ singleDeleteMask.onclick = e => { if(e.target===singleDeleteMask) closeSingleDel
 previewMask.onclick = e => { if(e.target===previewMask) closePreview(); };
 
 function setAppViewport(){
-  document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
-  document.documentElement.style.setProperty('--app-width', `${window.innerWidth}px`);
+  const visualViewport = window.visualViewport;
+  const width = visualViewport ? visualViewport.width : window.innerWidth;
+  const height = visualViewport ? visualViewport.height : window.innerHeight;
+  document.documentElement.style.setProperty('--app-height', `${height}px`);
+  document.documentElement.style.setProperty('--app-width', `${width}px`);
 }
+function scheduleViewportRefresh(){ [0, 120, 300, 650].forEach(delay => setTimeout(setAppViewport, delay)); }
 setAppViewport();
-window.addEventListener('resize', setAppViewport);
-window.addEventListener('orientationchange', () => setTimeout(setAppViewport, 250));
+window.addEventListener('resize', scheduleViewportRefresh);
+window.addEventListener('orientationchange', scheduleViewportRefresh);
+if(window.visualViewport) window.visualViewport.addEventListener('resize', scheduleViewportRefresh);
 render();
 </script>
 </body>
