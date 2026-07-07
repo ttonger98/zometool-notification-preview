@@ -102,6 +102,25 @@
       color: #2c5831;
       font-size: 16px;
     }
+    .tab-badge {
+      min-width: 20px;
+      height: 20px;
+      padding: 0 6px;
+      border-radius: 999px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      margin-left: auto;
+      background: #FF5967;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 950;
+      line-height: 1;
+      box-shadow: 0 3px 8px rgba(255,89,103,.28), inset 0 0 0 1px rgba(255,255,255,.55);
+      text-shadow: none;
+    }
+    .tab-badge.show { display: inline-flex; }
+    .nav-item.active .tab-badge { margin-right: 8px; }
     .nav-line {
       position: absolute;
       left: 113px;
@@ -253,7 +272,7 @@
     }
     .detail-title { margin: 0; font-size: 27px; line-height: 1.22; font-weight: 900; }
     .detail-time { font-size: 16px; color: #8b92a2; font-weight: 800; white-space: nowrap; }
-    .meta-row { display: flex; justify-content: space-between; margin: 10px 0 8px; color: #7f8798; font-size: 15px; font-weight: 800; }
+    .meta-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin: 10px 0 8px; color: #7f8798; font-size: 15px; font-weight: 800; }
     .mail-body { font-size: 19px; line-height: 1.55; font-weight: 850; color: #2d354b; margin-top: 8px; max-height: 104px; overflow: hidden; }
     .mail-body .hot { color: #ff9900; }
     .media-block {
@@ -301,10 +320,137 @@
       box-shadow: inset 0 0 0 2px rgba(255,255,255,.25);
       cursor: pointer;
     }
-    .media-block.batch { grid-template-columns: 1fr; max-width: 430px; }
+    .media-block.batch { grid-template-columns: 1fr; max-width: 100%; overflow: hidden; margin-bottom: 76px; }
+    .media-block.batch .attachments { flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; padding: 2px 4px 10px 2px; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
+    .media-block.batch .attachments::-webkit-scrollbar { height: 6px; }
+    .media-block.batch .attachments::-webkit-scrollbar-thumb { background: rgba(67,169,244,.28); border-radius: 999px; }
+    .media-block.batch .work-card { flex: 0 0 76px; scroll-snap-align: start; }
+    .media-block.simple { grid-template-columns: 1fr; max-width: 140px; }
+    .media-block.simple .work-card { width: 104px; }
     .media-block.batch .attach-card { width: 76px; height: 76px; font-size: 32px; }
-    .attach-card::after { content: "✓"; position: absolute; right: -5px; top: -7px; width: 21px; height: 21px; border-radius: 50%; background: #1a9a64; color: #fff; display: grid; place-items: center; font-size: 15px; }
+    .attach-card::after { display: none !important; }
     .attach-card span { position: absolute; right: 5px; bottom: 2px; color: #fff; font-size: 18px; font-weight: 900; text-shadow: 0 2px 5px rgba(0,0,0,.55); }
+    .detail-aside {
+      display: grid;
+      justify-items: end;
+      gap: 10px;
+      min-width: 112px;
+    }
+    .model-thumb {
+      width: 86px;
+      height: 68px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 36px;
+      position: relative;
+      cursor: pointer;
+      box-shadow: 0 10px 22px rgba(65,123,160,.14), inset 0 0 0 2px rgba(255,255,255,.35);
+    }
+    .meta-model-thumb {
+      flex: 0 0 auto;
+      margin-top: -4px;
+    }
+    .model-thumb::before {
+      content: attr(data-label);
+      position: absolute;
+      left: 7px;
+      top: 7px;
+      padding: 3px 7px;
+      border-radius: 10px;
+      background: rgba(255,255,255,.86);
+      color: #338FD3;
+      font-size: 10px;
+      font-weight: 900;
+    }
+    .followup-gallery {
+      margin-top: 20px;
+      margin-bottom: 76px;
+      position: relative;
+      z-index: 1;
+      max-width: 100%;
+    }
+    .gallery-title {
+      margin-bottom: 10px;
+      color: #338FD3;
+      font-size: 15px;
+      font-weight: 900;
+    }
+    .gallery-scroll {
+      display: flex;
+      gap: 14px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 2px 4px 12px 2px;
+      scroll-snap-type: x proximity;
+      -webkit-overflow-scrolling: touch;
+    }
+    .gallery-scroll::-webkit-scrollbar { height: 6px; }
+    .gallery-scroll::-webkit-scrollbar-thumb { background: rgba(67,169,244,.28); border-radius: 999px; }
+    .work-card {
+      flex: 0 0 128px;
+      scroll-snap-align: start;
+      display: grid;
+      gap: 8px;
+    }
+    .work-img {
+      width: 128px;
+      height: 96px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 42px;
+      cursor: pointer;
+      box-shadow: 0 10px 22px rgba(65,123,160,.12), inset 0 0 0 2px rgba(255,255,255,.30);
+    }
+    .work-name {
+      color: #5F6874;
+      font-size: 12px;
+      font-weight: 900;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .avatar-strip {
+      margin-top: 14px;
+      margin-bottom: 76px;
+      position: relative;
+      z-index: 1;
+      max-width: 100%;
+    }
+    .avatar-card {
+      flex: 0 0 66px;
+      display: grid;
+      justify-items: center;
+      gap: 6px;
+      scroll-snap-align: start;
+      cursor: pointer;
+    }
+    .avatar-face {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 24px;
+      font-weight: 900;
+      box-shadow: 0 8px 18px rgba(65,123,160,.12), inset 0 0 0 2px rgba(255,255,255,.35);
+    }
+    .avatar-name {
+      max-width: 66px;
+      color: #5F6874;
+      font-size: 11px;
+      font-weight: 900;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .attach-card::after { display: none !important; }
 
     .detail-actions {
       position: absolute;
@@ -361,6 +507,13 @@
     .confirm-modal h3 { margin: 0 0 12px; font-size: 22px; }
     .confirm-modal p { margin: 0 0 22px; font-size: 17px; }
     .confirm-actions { display: flex; justify-content: center; gap: 16px; }
+    .preview-panel {
+      display: grid;
+      justify-items: center;
+      gap: 14px;
+      position: relative;
+      z-index: 11;
+    }
     .preview-box {
       width: 650px;
       height: 350px;
@@ -372,7 +525,47 @@
       box-shadow: inset 0 0 0 3px rgba(255,255,255,.25), 0 24px 80px rgba(0,0,0,.46);
       position: relative;
     }
-    .preview-box::after { content: attr(data-title); position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 18px; font-size: 18px; font-weight: 900; background: linear-gradient(180deg, transparent, rgba(0,0,0,.42)); }
+    .preview-caption {
+      color: #fff;
+      font-size: 18px;
+      font-weight: 900;
+      text-shadow: 0 2px 8px rgba(0,0,0,.34);
+    }
+    .preview-user {
+      min-height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 900;
+      text-shadow: 0 2px 8px rgba(0,0,0,.34);
+    }
+    .preview-user:empty { display: none; }
+    .preview-user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 900;
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,.35), 0 6px 14px rgba(0,0,0,.18);
+    }
+    .preview-go {
+      min-width: 132px;
+      height: 42px;
+      border: 0;
+      border-radius: 15px;
+      background: linear-gradient(180deg, #FFC64A, #FFA12E);
+      color: #7B4B13;
+      font-size: 18px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 12px 22px rgba(255,166,46,.22), inset 0 0 0 1px rgba(255,255,255,.60);
+    }
     .preview-close { position: absolute; right: 40px; top: 30px; color: #fff; font-size: 42px; cursor: pointer; z-index: 11; }
     .toast { position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%) translateY(20px); background: rgba(34, 55, 92, .92); color: #fff; border-radius: 999px; padding: 10px 18px; opacity: 0; transition: .2s; z-index: 12; font-weight: 900; }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -932,9 +1125,21 @@
       filter: saturate(.76) brightness(1.04);
       box-shadow: 0 8px 18px rgba(65,123,160,.10);
     }
-    .media-block.batch { max-width: 392px; }
+    .media-block.batch { max-width: 100%; margin-bottom: 76px; }
+    .media-block.batch .work-card { flex-basis: 66px; }
+    .media-block.simple { max-width: 120px; }
+    .media-block.simple .work-card { width: 88px; }
     .media-block.batch .attach-card { width: 66px; height: 66px; font-size: 28px; }
     .attach-card::after { width: 18px; height: 18px; font-size: 12px; }
+    .detail-aside { min-width: 96px; gap: 8px; }
+    .model-thumb { width: 76px; height: 60px; border-radius: 18px; font-size: 28px; }
+    .model-thumb::before { font-size: 9px; }
+    .followup-gallery { margin-top: 16px; margin-bottom: 76px; }
+    .gallery-title { font-size: 14px; margin-bottom: 9px; }
+    .gallery-scroll { gap: 12px; }
+    .work-card { flex-basis: 112px; }
+    .work-img { width: 112px; height: 86px; border-radius: 18px; font-size: 36px; }
+    .work-name { font-size: 11px; }
     .detail-actions {
       right: 24px;
       bottom: 22px;
@@ -1114,8 +1319,11 @@
     }
     .preview-box {
       width: min(72vw, 580px);
-      height: min(76vh, 320px);
+      height: min(64vh, 320px);
     }
+    .preview-panel { gap: 12px; }
+    .preview-caption { font-size: 16px; }
+    .preview-go { min-width: 112px; height: 38px; font-size: 16px; }
     .activity-banner {
       margin-top: 14px;
       width: min(100%, 430px);
@@ -1280,10 +1488,23 @@
       .detail-head { gap: 10px !important; padding-bottom: 9px !important; }
       .detail-title { font-size: 18px !important; line-height: 1.22 !important; }
       .detail-time { font-size: 11px !important; }
+      .detail-aside { min-width: 68px !important; gap: 5px !important; }
+      .model-thumb { width: 54px !important; height: 42px !important; border-radius: 13px !important; font-size: 20px !important; }
+      .model-thumb::before { left: 4px !important; top: 4px !important; padding: 2px 5px !important; font-size: 8px !important; }
+      .followup-gallery { margin-top: 10px !important; margin-bottom: 58px !important; }
+      .gallery-title { margin-bottom: 7px !important; font-size: 11px !important; }
+      .gallery-scroll { gap: 8px !important; padding-bottom: 8px !important; }
+      .work-card { flex-basis: 72px !important; gap: 5px !important; }
+      .work-img { width: 72px !important; height: 54px !important; border-radius: 13px !important; font-size: 24px !important; }
+      .work-name { font-size: 9px !important; }
+      .avatar-card { flex-basis: 46px !important; gap: 4px !important; }
+      .avatar-face { width: 38px !important; height: 38px !important; font-size: 17px !important; }
+      .avatar-name { max-width: 46px !important; font-size: 8px !important; }
+      .avatar-strip { margin-bottom: 58px !important; }
       .meta-row { margin: 8px 0 7px !important; font-size: 11px !important; }
       .mail-body { font-size: 14px !important; line-height: 1.42 !important; max-height: 60px !important; margin-top: 6px !important; }
       .media-block { margin-top: 10px !important; grid-template-columns: 88px 1fr !important; gap: 10px !important; max-width: 330px !important; }
-      .media-block.batch { max-width: 330px !important; }
+      .media-block.batch { max-width: 100% !important; margin-bottom: 58px !important; }
       .attach-title { height: 23px !important; min-width: 104px !important; padding-left: 8px !important; font-size: 12px !important; margin-bottom: 7px !important; }
       .media-copy { font-size: 12px !important; line-height: 1.3 !important; }
       .attach-card { width: 58px !important; height: 58px !important; border-radius: 14px !important; font-size: 24px !important; }
@@ -1332,6 +1553,15 @@
         min-width: 0 !important;
       }
       .detail-time { font-size: 10px !important; }
+      .detail-aside { min-width: 56px !important; gap: 4px !important; }
+      .model-thumb { width: 44px !important; height: 34px !important; border-radius: 10px !important; font-size: 17px !important; }
+      .model-thumb::before { left: 3px !important; top: 3px !important; padding: 1px 4px !important; font-size: 7px !important; }
+      .followup-gallery { margin-top: 8px !important; margin-bottom: 50px !important; }
+      .gallery-title { margin-bottom: 5px !important; font-size: 10px !important; }
+      .gallery-scroll { gap: 6px !important; padding-bottom: 7px !important; }
+      .work-card { flex-basis: 58px !important; gap: 4px !important; }
+      .work-img { width: 58px !important; height: 44px !important; border-radius: 10px !important; font-size: 20px !important; }
+      .work-name { font-size: 8px !important; }
       .meta-row { margin: 6px 0 5px !important; font-size: 10px !important; }
       .mail-body {
         font-size: clamp(11px, 3.45vw, 13px) !important;
@@ -1348,6 +1578,7 @@
       }
       .media-block.batch {
         max-width: 100% !important;
+        margin-bottom: 50px !important;
       }
       .attachments { gap: 6px !important; }
       .attach-title {
@@ -1369,6 +1600,7 @@
         height: 42px !important;
         font-size: 18px !important;
       }
+      .media-block.batch .work-card { flex-basis: 42px !important; }
       .attach-card::after { width: 14px !important; height: 14px !important; font-size: 9px !important; right: -3px !important; top: -4px !important; }
       .attach-card span { font-size: 9px !important; right: 3px !important; }
       .media-copy {
@@ -1388,6 +1620,7 @@
       .banner-copy b { font-size: 13px !important; line-height: 1.14 !important; }
       .banner-copy span { font-size: 10px !important; line-height: 1.22 !important; }
       .banner-icon { width: 42px !important; height: 42px !important; border-radius: 13px !important; font-size: 22px !important; }
+      .avatar-strip { margin-bottom: 50px !important; }
       .detail-actions {
         right: 12px !important;
         bottom: 10px !important;
@@ -1545,8 +1778,24 @@
       outline-offset: -5px !important;
     }
 
+
+    .mail-item .mail-text {
+      min-width: 0 !important;
+      overflow: hidden !important;
+    }
+    .mail-item .mail-text h3 {
+      display: block !important;
+      max-width: 100% !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+    }
+
     /* Remove unread left blue bar */
     .mail-item.unread::before { display: none !important; }
+
+    .mail-count, .starline { display: none !important; }
+    .mail-list-panel { padding-top: 18px !important; }
 
     /* Remove message red dot indicator */
     .mail-item.unread::after { display: none !important; }
@@ -1559,9 +1808,9 @@
     <div class="top-title"><span class="back">↩</span><span>消息通知</span></div>
     <div class="nav-line"></div>
     <nav class="nav" id="nav">
-      <div class="nav-item active" data-tab="all">全部</div>
-      <div class="nav-item" data-tab="system">系统</div>
-      <div class="nav-item" data-tab="feedback">互动反馈</div>
+      <div class="nav-item active" data-tab="all"><span class="tab-label">全部</span><span class="tab-badge" data-badge="all"></span></div>
+      <div class="nav-item" data-tab="system"><span class="tab-label">系统</span><span class="tab-badge" data-badge="system"></span></div>
+      <div class="nav-item" data-tab="feedback"><span class="tab-label">互动反馈</span><span class="tab-badge" data-badge="feedback"></span></div>
     </nav>
 
     <section class="mail-shell">
@@ -1569,8 +1818,6 @@
     </section>
 
     <aside class="mail-list-panel">
-      <div class="mail-count" title="时间展示边界：刚刚 / N分钟前 / 今天 HH:mm / 昨天 HH:mm / 周X HH:mm / 上周X / MM/DD / YYYY/MM/DD">已读：<b id="countText">0/0</b></div>
-      <div class="starline"></div>
       <div class="mail-list" id="mailList"></div>
       <div class="panel-actions">
         <button class="game-btn disabled" id="readAll">一键已读</button>
@@ -1598,7 +1845,7 @@
         </div>
       </div>
     </div>
-    <div class="preview-mask" id="previewMask"><div class="preview-close" onclick="closePreview()">×</div><div class="preview-box" id="previewBox"></div></div>
+    <div class="preview-mask" id="previewMask"><div class="preview-close" onclick="closePreview()">×</div><div class="preview-panel"><div class="preview-box" id="previewBox"></div><div class="preview-caption" id="previewCaption"></div><div class="preview-user" id="previewUser"></div><button class="preview-go" onclick="goPreviewTarget()">去看看</button></div></div>
     <div class="toast" id="toast">已操作</div>
   </div>
   </div></div></div>
@@ -1606,42 +1853,43 @@
 <script>
 const messages = [
   {id:1, sort:2300, tab:'system', unread:true, icon:'🎯', title:'新一期活动招募开始啦', text:'新一期拼搭活动正在招募中，点击去看看可查看活动规则和参与入口。', time:'刚刚', from:'UGC更新', valid:'29天', banner:{label:'活动 Banner', title:'ZOMETOOL 夏日拼搭招募', subtitle:'上传你的创意作品，赢取官方展示机会', icon:'🎯', bg:'linear-gradient(135deg,#2D74C4,#73C8FF 52%,#FFE7A6)'}},
-  {id:2, sort:2220, tab:'system', unread:true, icon:'🖼️', title:'新作品集上线了', text:'官方新作品集已上线，收录多个优秀拼搭作品。', time:'8分钟前', from:'UGC更新', valid:'29天'},
-  {id:3, sort:2141, tab:'system', unread:true, icon:'📣', title:'你有一条新的营销信息', text:'限时活动信息已更新，点击去看看查看完整内容。', time:'59分钟前', from:'营销信息', valid:'7天'},
-  {id:4, sort:1680, tab:'system', unread:true, icon:'🆕', title:'造型库上新了 36 个新造型', text:'本期造型库新增 36 个官方造型。列表仅展示代表造型，点击去看看查看完整上新列表。', time:'今天 09:30', from:'造型库', valid:'30天', batch:true, attach:[['🏗️','天空塔','#4B6BFF'],['🌉','三角桥','#22B573'],['🎡','摩天轮','#FF9D2E'],['🚀','火箭站','#7657FF']]},
+  {id:2, sort:2220, tab:'system', unread:true, icon:'🖼️', title:'新作品集上线了', text:'官方新作品集已上线，收录多个优秀拼搭作品。', time:'8分钟前', from:'UGC更新', valid:'29天', banner:{label:'作品集 Banner', title:'官方新作品集上线', subtitle:'收录多个优秀拼搭作品，快来看看创意灵感', icon:'🖼️', bg:'linear-gradient(135deg,#5D8CFF,#BFE8FF 55%,#FFE5A8)'}},
+  {id:4, sort:1680, tab:'system', unread:true, icon:'🆕', title:'造型库上新了 36 个新造型', text:'本期造型库新增 36 个官方造型。', time:'今天 09:30', from:'造型库', valid:'30天', batch:true, attach:[['🏗️','天空塔','#4B6BFF'],['🌉','三角桥','#22B573'],['🎡','摩天轮','#FF9D2E'],['🚀','火箭站','#7657FF'],['🏛️','古典剧院','#FF8A3D'],['🛰️','星际卫星','#2D74C4'],['🛠️','机械臂','#7D5FFF'],['🗼','信号塔','#12B3A8'],['🌁','蓝色小城','#54C6FF'],['🚁','直升机','#FF6B6B'],['⛲','喷泉广场','#47C47A'],['🛸','飞碟基地','#8E6CFF'],['🏰','水晶城堡','#69B7FF'],['🌌','星轨门','#5E72E4'],['🧭','探索罗盘','#F6A623'],['🔭','观星台','#2C9FA3'],['🪐','环形星球','#7B61FF'],['🌋','火山塔','#FF7043'],['🧬','双螺旋','#26C6DA'],['⚙️','齿轮桥','#8D99AE'],['🦕','恐龙骨架','#43A047'],['🐲','飞龙骨架','#EC407A'],['⛵','风帆船','#29B6F6'],['🚢','远航舰','#3F51B5'],['🏟️','圆顶场馆','#FFA726'],['🎢','过山车','#AB47BC'],['🧩','立方拼图','#00ACC1'],['🔺','三角穹顶','#EF5350'],['💎','晶体塔','#42A5F5'],['🌲','森林小屋','#66BB6A'],['🦋','蝴蝶翼','#7E57C2'],['🧱','积木城墙','#8D6E63'],['🎠','旋转木马','#FFB74D'],['🗽','自由塔','#26A69A'],['🏜️','沙漠基地','#D4A056'],['🌊','海浪桥','#26C6DA']]},
   {id:5, sort:900, tab:'system', unread:true, icon:'🔧', title:'造型库功能模块更新', text:'造型库新增筛选和主题合集入口，可以更快找到想拼的造型。', time:'昨天 18:20', from:'造型库', valid:'30天'},
-  {id:6, sort:650, tab:'system', unread:false, icon:'📚', title:'新课程上线了', text:'新的 Zometool 课程已上线，点击可查看课程详情。', time:'周一 10:00', from:'课程', valid:'30天'},
+  {id:6, sort:650, tab:'system', unread:false, icon:'📚', title:'新课程上线了', text:'新的 Zometool 课程已上线，点击可查看课程详情。', time:'周一 10:00', from:'课程', valid:'30天', banner:{label:'课程 Banner', title:'ZOMETOOL 新课程上线', subtitle:'学习新的拼搭技巧，解锁更多空间结构', icon:'📚', bg:'linear-gradient(135deg,#2C9FA3,#B8F2D4 55%,#FFE7A6)'}},
   {id:7, sort:300, tab:'system', unread:false, icon:'⚠️', title:'作品暂未通过审核', text:'不通过原因：作品封面不清晰，无法准确展示拼搭主体。请重新上传清晰封面后再提交审核。', time:'上周一', from:'作品圈', valid:'永久', image:['🏗️','linear-gradient(135deg,#FF9D2E,#FFE08A)'], imageLabel:'作品图'},
   {id:8, sort:120, tab:'system', unread:false, icon:'🏅', title:'你获得了 V 标', text:'恭喜你获得 V 标，你的主页已展示新的身份标识。', time:'06/12', from:'成就', valid:'永久'},
-  {id:9, sort:20, tab:'system', unread:false, icon:'🎁', title:'造型被收藏入库', text:'你的造型已被收藏入官方入库列表，后续可能被更多用户看到。', time:'2025/12/28', from:'成就', valid:'永久', image:['🌉','linear-gradient(135deg,#22B573,#B8F2D4)'], imageLabel:'造型图'},
+  {id:9, sort:20, tab:'system', unread:false, icon:'🎁', title:'恭喜！你的 3 个造型入选官方造型库', text:'恭喜你！你的 3 个造型已被官方选中入库。感谢你持续带来精彩创作，它们将出现在造型库中，为更多用户提供跟拼参考。快去看看吧！', time:'2025/12/28', from:'Zometool官方', valid:'永久', entry:true, attach:[['🌉','三角桥','#22B573'],['🏗️','天空塔','#4B6BFF'],['🌌','星轨门','#5E72E4']]},
 
-  {id:10, sort:2290, tab:'feedback', unread:true, icon:'⭐', title:'你的造型被收藏了 9 次', text:'安安和其他 8 个用户收藏了你的造型。', time:'刚刚', from:'造型库', valid:'永久', image:['🏛️','linear-gradient(135deg,#FF9D2E,#FFE08A)'], imageLabel:'造型图'},
-  {id:11, sort:2188, tab:'feedback', unread:false, icon:'🧱', title:'有人跟拼了你的造型', text:'木木和其他 2 个用户跟拼了你的造型。', time:'12分钟前', from:'造型库', valid:'永久', image:['🌉','linear-gradient(135deg,#22B573,#B8F2D4)'], imageLabel:'造型图'},
-  {id:12, sort:1765, tab:'feedback', unread:false, icon:'🔁', title:'你的造型被分享了 15 次', text:'乐乐和其他 14 个用户分享了你的造型。', time:'今天 14:05', from:'造型库', valid:'永久', image:['🏗️','linear-gradient(135deg,#F7971E,#FFD200)'], imageLabel:'造型图'},
-  {id:13, sort:880, tab:'feedback', unread:false, icon:'💎', title:'跟拼作品被收藏了 6 次', text:'小小明和其他 5 个用户收藏了你的跟拼作品【星际直升机】。', time:'昨天 21:16', from:'造型库', valid:'永久', image:['🛰️','linear-gradient(135deg,#2D74C4,#9FD8FF)'], imageLabel:'作品图'},
-  {id:14, sort:620, tab:'feedback', unread:false, icon:'👍', title:'跟拼作品被点赞了 24 次', text:'豆豆和其他 23 个用户赞了你的跟拼作品【星际直升机】。', time:'周五 18:30', from:'造型库', valid:'永久', image:['🧩','linear-gradient(135deg,#11998E,#38EF7D)'], imageLabel:'作品图'},
-  {id:15, sort:290, tab:'feedback', unread:false, icon:'🔁', title:'跟拼作品被分享了 8 次', text:'可可和其他 7 个用户分享了你的跟拼作品【星际直升机】。', time:'上周一', from:'造型库', valid:'永久', image:['🕊️','linear-gradient(135deg,#7657FF,#E6B8FF)'], imageLabel:'作品图'},
-  {id:16, sort:110, tab:'feedback', unread:false, icon:'🏆', title:'有人夸了夸你的跟拼作品', text:'天天夸了夸你的跟拼作品【星际直升机】：这个结构很稳，配色也很漂亮！', time:'06/03', from:'造型库', valid:'永久', image:['🏆','linear-gradient(135deg,#FF7A59,#FFD166)'], imageLabel:'作品图'},
-  {id:17, sort:10, tab:'feedback', unread:false, icon:'💬', title:'共创达人评论了你的跟拼作品', text:'共创达人橙子评论了你的跟拼作品【星际直升机】：这个角度处理得很好，可以试试加高底座。', time:'2025/11/18', from:'造型库', valid:'永久', image:['🛠️','linear-gradient(135deg,#8E2DE2,#4A00E0)'], imageLabel:'作品图'},
-  {id:18, sort:2285, tab:'feedback', unread:true, icon:'👍', title:'你的作品收到了 18 个赞', text:'乐乐和其他 17 个用户赞了你的作品【夏日摩天轮】。', time:'刚刚', from:'作品圈', valid:'永久', image:['🚀','linear-gradient(135deg,#4B6BFF,#88D8FF)'], imageLabel:'作品图'},
-  {id:19, sort:1900, tab:'feedback', unread:false, icon:'⭐', title:'你的作品被收藏了 12 次', text:'安安和其他 11 个用户收藏了你的作品【夏日摩天轮】。', time:'今天 16:20', from:'作品圈', valid:'永久', image:['🛰️','linear-gradient(135deg,#2D74C4,#9FD8FF)'], imageLabel:'作品图'},
-  {id:20, sort:1600, tab:'feedback', unread:false, icon:'🔁', title:'你的作品被分享了 6 次', text:'木木和其他 5 个用户分享了你的作品【夏日摩天轮】。', time:'昨天 20:05', from:'作品圈', valid:'永久', image:['🕊️','linear-gradient(135deg,#7657FF,#E6B8FF)'], imageLabel:'作品图'},
-  {id:21, sort:780, tab:'feedback', unread:false, icon:'🏆', title:'有人夸了夸你的作品', text:'小宇夸了夸你的作品【夏日摩天轮】：这件作品太有创意了！', time:'周三 11:10', from:'作品圈', valid:'永久', image:['🏆','linear-gradient(135deg,#FF7A59,#FFD166)'], imageLabel:'作品图'},
-  {id:22, sort:100, tab:'feedback', unread:false, icon:'💬', title:'共创达人评论了你的作品', text:'共创达人橙子评论了你的作品【夏日摩天轮】：结构很稳定，顶部造型也很有创意！', time:'06/18', from:'作品圈', valid:'永久', image:['🚀','linear-gradient(135deg,#4B6BFF,#88D8FF)'], imageLabel:'作品图'},
-  {id:23, sort:5, tab:'feedback', unread:false, icon:'👥', title:'你有新的粉丝', text:'安安和其他 4 个用户关注了你。', time:'2025/10/01', from:'作品圈', valid:'永久'}
+  {id:10, sort:2290, tab:'feedback', unread:true, icon:'⭐', title:'有 9 个人收藏了你的造型', text:'安安和其他 8 个用户收藏了你的造型【古典剧院】。', time:'刚刚', from:'造型库', valid:'永久', image:['🏛️','linear-gradient(135deg,#FF9D2E,#FFE08A)'], imageLabel:'造型图', users:[['安安','安','#FF9D2E'],['小宇','宇','#4B6BFF'],['乐乐','乐','#22B573'],['豆豆','豆','#7657FF'],['可可','可','#FF7A59'],['木木','木','#12B3A8'],['天天','天','#2D74C4'],['橙子','橙','#F7971E'],['小石头','石','#7657FF']]},
+  {id:11, sort:2188, tab:'feedback', unread:false, icon:'🧱', title:'有人跟拼了你的造型', text:'木木和其他 2 个用户跟拼了你的造型【三角桥】。', time:'12分钟前', from:'造型库', valid:'永久', image:['🌉','linear-gradient(135deg,#22B573,#B8F2D4)'], imageLabel:'造型图', modelName:'三角桥', followupWorks:[{icon:'🌁', title:'蓝色小城', user:'木木', userColor:'#22B573', bg:'linear-gradient(135deg,#54C6FF,#B6F1FF)'},{icon:'🏗️', title:'', user:'小石头', userColor:'#7657FF', bg:'linear-gradient(135deg,#FF9D2E,#FFE08A)'},{icon:'🎡', title:'摩天轮练习', user:'乐乐', userColor:'#F7971E', bg:'linear-gradient(135deg,#7657FF,#D6C6FF)'}]},
+  {id:12, sort:1765, tab:'feedback', unread:false, icon:'🔁', title:'有 15 个人分享了你的造型', text:'乐乐和其他 14 个用户分享了你的造型【天空塔】。', time:'今天 14:05', from:'造型库', valid:'永久', image:['🏗️','linear-gradient(135deg,#F7971E,#FFD200)'], imageLabel:'造型图', users:[['乐乐','乐','#F7971E'],['木木','木','#22B573'],['小石头','石','#7657FF'],['天天','天','#2D74C4'],['安安','安','#FF9D2E'],['小宇','宇','#4B6BFF'],['豆豆','豆','#7657FF'],['可可','可','#FF7A59'],['橙子','橙','#F7971E'],['小小明','明','#12B3A8'],['贝贝','贝','#2C9FA3'],['米米','米','#EC407A'],['阿布','布','#8D99AE'],['糖糖','糖','#AB47BC'],['七七','七','#43A047']]},
+  {id:13, sort:880, tab:'feedback', unread:false, icon:'💎', title:'有 6 个人收藏了你的跟拼作品', text:'小小明和其他 5 个用户收藏了你的跟拼作品【星际直升机】。', time:'昨天 21:16', from:'造型库', valid:'永久', image:['🛰️','linear-gradient(135deg,#2D74C4,#9FD8FF)'], imageLabel:'作品图', users:[['小小明','明','#12B3A8'],['安安','安','#FF9D2E'],['乐乐','乐','#22B573'],['木木','木','#4B6BFF'],['豆豆','豆','#7657FF'],['可可','可','#FF7A59']]},
+  {id:14, sort:620, tab:'feedback', unread:false, icon:'👍', title:'有 24 个人赞了你的跟拼作品', text:'豆豆和其他 23 个用户赞了你的跟拼作品【星际直升机】。', time:'周五 18:30', from:'造型库', valid:'永久', image:['🧩','linear-gradient(135deg,#11998E,#38EF7D)'], imageLabel:'作品图', users:[['豆豆','豆','#7657FF'],['乐乐','乐','#22B573'],['安安','安','#FF9D2E'],['木木','木','#4B6BFF'],['小宇','宇','#FF7A59'],['可可','可','#7657FF'],['天天','天','#2D74C4'],['橙子','橙','#F7971E'],['小石头','石','#22B573'],['小小明','明','#12B3A8'],['贝贝','贝','#2C9FA3'],['米米','米','#EC407A'],['阿布','布','#8D99AE'],['糖糖','糖','#AB47BC'],['七七','七','#43A047'],['西西','西','#5E72E4'],['南南','南','#26C6DA'],['圆圆','圆','#FF7043'],['果果','果','#66BB6A'],['点点','点','#8E6CFF'],['阿奇','奇','#FFA726'],['小蓝','蓝','#29B6F6'],['朵朵','朵','#EC407A'],['石榴','榴','#EF5350']]},
+  {id:15, sort:290, tab:'feedback', unread:false, icon:'🔁', title:'有 8 个人分享了你的跟拼作品', text:'可可和其他 7 个用户分享了你的跟拼作品【星际直升机】。', time:'上周一', from:'造型库', valid:'永久', image:['🕊️','linear-gradient(135deg,#7657FF,#E6B8FF)'], imageLabel:'作品图', users:[['可可','可','#7657FF'],['木木','木','#4B6BFF'],['乐乐','乐','#F7971E'],['安安','安','#FF9D2E'],['天天','天','#2D74C4'],['小宇','宇','#FF7A59'],['豆豆','豆','#22B573'],['橙子','橙','#F7971E']]},
+  {id:16, sort:110, tab:'feedback', unread:false, icon:'🏆', title:'有人夸了夸你的跟拼作品', text:'天天夸了夸你的跟拼作品【星际直升机】：这个结构很稳，配色也很漂亮！', time:'06/03', from:'造型库', valid:'永久', image:['🛰️','linear-gradient(135deg,#2D74C4,#9FD8FF)'], imageLabel:'作品图', users:[['天天','天','#2D74C4']]},
+  {id:17, sort:10, tab:'feedback', unread:false, icon:'💬', title:'共创达人评论了你的跟拼作品', text:'共创达人橙子评论了你的跟拼作品【星际直升机】：这个角度处理得很好，可以试试加高底座。', time:'2025/11/18', from:'造型库', valid:'永久', image:['🛠️','linear-gradient(135deg,#8E2DE2,#4A00E0)'], imageLabel:'作品图', users:[['共创达人橙子','橙','#F7971E']]},
+  {id:18, sort:2285, tab:'feedback', unread:true, icon:'👍', title:'有 18 个人赞了你的作品', text:'乐乐和其他 17 个用户赞了你的作品【夏日摩天轮】。', time:'刚刚', from:'作品圈', valid:'永久', image:['🚀','linear-gradient(135deg,#4B6BFF,#88D8FF)'], imageLabel:'作品图', users:[['乐乐','乐','#22B573'],['安安','安','#FF9D2E'],['木木','木','#4B6BFF'],['豆豆','豆','#7657FF'],['小宇','宇','#FF7A59'],['可可','可','#7657FF'],['天天','天','#2D74C4'],['橙子','橙','#F7971E'],['小石头','石','#22B573'],['小小明','明','#12B3A8'],['贝贝','贝','#2C9FA3'],['米米','米','#EC407A'],['阿布','布','#8D99AE'],['糖糖','糖','#AB47BC'],['七七','七','#43A047'],['西西','西','#5E72E4'],['南南','南','#26C6DA'],['圆圆','圆','#FF7043']]},
+  {id:19, sort:1900, tab:'feedback', unread:false, icon:'⭐', title:'有 12 个人收藏了你的作品', text:'安安和其他 11 个用户收藏了你的作品【夏日摩天轮】。', time:'今天 16:20', from:'作品圈', valid:'永久', image:['🛰️','linear-gradient(135deg,#2D74C4,#9FD8FF)'], imageLabel:'作品图', users:[['安安','安','#FF9D2E'],['可可','可','#7657FF'],['天天','天','#2D74C4'],['橙子','橙','#FF7A59'],['乐乐','乐','#22B573'],['木木','木','#4B6BFF'],['小宇','宇','#7657FF'],['豆豆','豆','#FF7A59'],['小石头','石','#22B573'],['贝贝','贝','#2C9FA3'],['米米','米','#EC407A'],['糖糖','糖','#AB47BC']]},
+  {id:20, sort:1600, tab:'feedback', unread:false, icon:'🔁', title:'有 6 个人分享了你的作品', text:'木木和其他 5 个用户分享了你的作品【夏日摩天轮】。', time:'昨天 20:05', from:'作品圈', valid:'永久', image:['🕊️','linear-gradient(135deg,#7657FF,#E6B8FF)'], imageLabel:'作品图', users:[['木木','木','#4B6BFF'],['小石头','石','#22B573'],['乐乐','乐','#F7971E'],['安安','安','#FF9D2E'],['可可','可','#7657FF'],['天天','天','#2D74C4']]},
+  {id:21, sort:780, tab:'feedback', unread:false, icon:'🏆', title:'有人夸了夸你的作品', text:'小宇夸了夸你的作品【夏日摩天轮】：这件作品太有创意了！', time:'周三 11:10', from:'作品圈', valid:'永久', image:['🚀','linear-gradient(135deg,#4B6BFF,#88D8FF)'], imageLabel:'作品图', users:[['小宇','宇','#FF7A59']]},
+  {id:22, sort:100, tab:'feedback', unread:false, icon:'💬', title:'共创达人评论了你的作品', text:'共创达人橙子评论了你的作品【夏日摩天轮】：结构很稳定，顶部造型也很有创意！', time:'06/18', from:'作品圈', valid:'永久', image:['🚀','linear-gradient(135deg,#4B6BFF,#88D8FF)'], imageLabel:'作品图', users:[['共创达人橙子','橙','#F7971E']]},
+  {id:23, sort:5, tab:'feedback', unread:false, icon:'👥', title:'有 5 个人关注了你', text:'安安和其他 4 个用户关注了你！你真的太有魅力啦！', time:'2025/10/01', from:'作品圈', valid:'永久', users:[['安安','安','#FF9D2E'],['乐乐','乐','#22B573'],['木木','木','#4B6BFF'],['小宇','宇','#7657FF'],['豆豆','豆','#FF7A59']], noAction:true}
 ];
 let currentTab = 'all';
 let currentId = 1;
 const sessionOrder = {};
 const mailList = document.getElementById('mailList');
 const detailPaper = document.getElementById('detailPaper');
-const countText = document.getElementById('countText');
 const toast = document.getElementById('toast');
 const readAllButton = document.getElementById('readAll');
 const confirmMask = document.getElementById('confirmMask');
 const singleDeleteMask = document.getElementById('singleDeleteMask');
 const previewMask = document.getElementById('previewMask');
 const previewBox = document.getElementById('previewBox');
+const previewCaption = document.getElementById('previewCaption');
+const previewUser = document.getElementById('previewUser');
+let previewTargetLabel = '';
 function tabMessages(tab){ return tab === 'all' ? messages : messages.filter(m => m.tab === tab); }
 function buildFreshOrder(tab){
   return tabMessages(tab)
@@ -1666,53 +1914,85 @@ function filtered(){
   });
 }
 function ensureCurrent(){ const data = filtered(); if(!data.find(m => m.id === currentId)) currentId = (data.find(m=>m.unread) || data[0] || {}).id; }
+function escapeAttr(value){ return String(value).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function unreadCountFor(tab){ return tabMessages(tab).filter(m=>m.unread).length; }
+function updateTabBadges(){
+  document.querySelectorAll('.tab-badge').forEach(badge=>{
+    const count = unreadCountFor(badge.dataset.badge);
+    badge.textContent = count > 99 ? '99+' : count;
+    badge.classList.toggle('show', count > 0);
+  });
+}
 function render(){
   ensureCurrent();
   const data = filtered();
   const unreadCount = data.filter(m=>m.unread).length;
-  countText.textContent = `${data.filter(m=>!m.unread).length}/${data.length}`;
+  updateTabBadges();
   readAllButton.classList.toggle('disabled', unreadCount === 0);
   readAllButton.classList.toggle('read-active', unreadCount > 0);
-  mailList.innerHTML = data.map(m => `<div class="mail-item ${m.id===currentId?'active':''} ${m.unread?'unread':'read'}" onclick="selectMail(${m.id})"><div class="mail-icon ${m.gift?'gift':''}">${m.icon}</div><div class="mail-text"><h3>${m.title}</h3><p>${m.time}</p></div></div>`).join('') || '<div style="color:#fff;font-weight:900;text-align:center;margin-top:80px;">暂无消息</div>';
+  mailList.innerHTML = data.map(m => { const listTitle = m.title; return `<div class="mail-item ${m.id===currentId?'active':''} ${m.unread?'unread':'read'}" onclick="selectMail(${m.id})"><div class="mail-icon ${m.gift?'gift':''}">${m.icon}</div><div class="mail-text"><h3 title="${escapeAttr(listTitle)}">${listTitle}</h3><p>${m.time}</p></div></div>`; }).join('') || '<div style="color:#fff;font-weight:900;text-align:center;margin-top:80px;">暂无消息</div>';
   renderDetail();
 }
 function renderDetail(){
   const m = messages.find(x => x.id === currentId);
   if(!m){ detailPaper.innerHTML = '<div style="display:grid;place-items:center;height:100%;font-size:22px;color:#7f8798;font-weight:900;">暂无消息</div>'; return; }
-  const img = m.image ? `<div class="media-block"><div><div class="attach-title">🔗 ${m.imageLabel || '展示图'}</div><div class="attachments"><div class="attach-card" style="background:${m.image[1]}" onclick="openPreview('${m.image[0]}','${m.title.replace(/'/g,"\\'")}','${m.image[1]}')">${m.image[0]}</div></div></div><div class="media-copy"><b>点击图片可放大预览</b><br>用于补充识别具体作品或造型。</div></div>` : '';
-  const attach = m.attach ? `<div class="media-block batch"><div class="attach-title">🔗 代表造型</div><div class="attachments">${m.attach.map(a=>`<div class="attach-card" style="background:${a[2]}">${a[0]}<span>${a[1]}</span></div>`).join('')}</div><div class="media-copy"><b>仅展示部分代表造型</b>，完整上新列表点击去看看查看。</div></div>` : '';
+  const safeTitle = m.title.replace(/'/g,"\'");
+  const mediaName = getMediaName(m);
+  const img = m.image && !m.followupWorks && !m.users ? `<div class="media-block simple"><div class="work-card single"><div class="attach-card" style="background:${m.image[1]}" onclick="openPreview('${m.image[0]}','${mediaName.replace(/'/g,"\\'")}','${m.image[1]}')">${m.image[0]}</div><div class="work-name">${mediaName}</div></div></div>` : '';
+  const followupGallery = m.followupWorks ? `<div class="followup-gallery"><div class="gallery-scroll">${m.followupWorks.map(work=>{ const caption = work.title || `【${work.user}】的作品`; const avatar = work.avatar || work.user.slice(0,1); const userColor = work.userColor || '#4B6BFF'; return `<div class="work-card"><div class="work-img" style="background:${work.bg}" onclick="openPreview('${work.icon}','${caption.replace(/'/g,"\'")}','${work.bg}','${work.user}','${avatar}','${userColor}','跟拼作品详情页')">${work.icon}</div><div class="work-name">${caption}</div></div>`; }).join('')}</div></div>` : '';
+  const attach = m.attach ? `<div class="media-block batch"><div class="attachments">${m.attach.map(a=>`<div class="work-card"><div class="attach-card" style="background:${a[2]}" onclick="openPreview('${a[0]}','${a[1].replace(/'/g,"\'")}','${a[2]}','','','','造型详情页')">${a[0]}</div><div class="work-name">${a[1]}</div></div>`).join('')}</div></div>` : '';
+  const userStrip = m.users ? `<div class="avatar-strip"><div class="gallery-scroll">${m.users.map(u=>`<div class="avatar-card" onclick="showToast('进入${u[0]}的主页')"><div class="avatar-face" style="background:${u[2]}">${u[1]}</div><div class="avatar-name">${u[0]}</div></div>`).join('')}</div></div>` : '';
   const banner = m.banner ? `<div class="activity-banner" style="background:${m.banner.bg}" onclick="goViewCurrent()"><div class="banner-copy"><div class="banner-label">${m.banner.label}</div><b>${m.banner.title}</b><span>${m.banner.subtitle}</span></div><div class="banner-icon">${m.banner.icon}</div></div>` : '';
-  const canGo = m.tab === 'system' || /跟拼|评论|夸一夸|夸了夸|粉丝|收藏|点赞|分享/.test(m.title);
+  const showImageInMeta = m.image && (m.followupWorks || m.users || /跟拼作品被|夸了夸|评论/.test(m.title));
+  const metaLabel = m.followupWorks ? '原造型' : (m.imageLabel === '造型图' ? '造型' : '作品');
+  const metaModel = showImageInMeta ? `<div class="model-thumb meta-model-thumb" data-label="${metaLabel}" style="background:${m.image[1]}" onclick="openPreview('${m.image[0]}','${mediaName.replace(/'/g,"\\'")}','${m.image[1]}')">${m.image[0]}</div>` : '';
+  const canGo = !m.noAction && (m.tab === 'system' || /跟拼|评论|夸一夸|夸了夸|粉丝|收藏|点赞|分享/.test(m.title));
   const actionText = m.title.includes('暂未通过审核') ? '去修改' : '去看看';
   const action = canGo ? `<button class="goto-mail" onclick="goViewCurrent()">${actionText}</button>` : '';
   const body = formatMessageBody(m.text);
-  detailPaper.innerHTML = `<div class="detail-head"><h2 class="detail-title">${m.title}</h2><div class="detail-time">${m.time}</div></div><div class="meta-row"><span>来自：${m.from}</span></div><div class="mail-body">${body}</div>${banner || img || attach}<div class="detail-actions">${action}<button class="delete-mail" onclick="openSingleDeleteConfirm()">删除消息</button></div>`;
+  detailPaper.innerHTML = `<div class="detail-head"><h2 class="detail-title">${m.title}</h2><div class="detail-time">${m.time}</div></div><div class="meta-row"><span>来自：${m.from}</span>${metaModel}</div><div class="mail-body">${body}</div>${followupGallery || banner || img || attach}${userStrip}<div class="detail-actions">${action}<button class="delete-mail" onclick="openSingleDeleteConfirm()">删除消息</button></div>`;
+}
+
+function getMediaName(message){
+  if(message.modelName) return message.modelName;
+  const bracketMatch = message.text && message.text.match(/【([^】]+)】/);
+  if(bracketMatch) return bracketMatch[1];
+  if(message.imageLabel === '造型图') return '造型名字';
+  if(message.imageLabel === '作品图') return '作品标题';
+  return '图片标题';
 }
 
 function formatMessageBody(text){
-  const highlighted = text.replace(/不通过原因|夸一夸|夸了夸|共创达人评论/g, '<span class="hot">$&</span>');
-  const names = ['安安','木木','乐乐','小小明','豆豆','可可','天天','橙子','小宇'];
-  for(const name of names){
-    if(highlighted.startsWith(name)){
-      return highlighted.replace(name, `<span class="user-link" onclick="openUserProfile('${name}')">${name}</span>`);
-    }
-    const expert = `共创达人${name}`;
-    if(highlighted.startsWith(expert)){
-      return highlighted.replace(expert, `<span class="user-link" onclick="openUserProfile('${name}')">${expert}</span>`);
-    }
-  }
-  return highlighted;
+  return text.replace(/不通过原因|夸一夸|夸了夸|共创达人评论/g, '<span class="hot">$&</span>');
 }
-function openUserProfile(name){ showToast(`进入${name}的个人主页`); }
 function selectMail(id){ currentId = id; const m = messages.find(x=>x.id===id); if(m) m.unread=false; render(); }
 function deleteCurrent(){ const idx = messages.findIndex(m=>m.id===currentId); if(idx>=0) messages.splice(idx,1); Object.keys(sessionOrder).forEach(tab=>{ sessionOrder[tab] = sessionOrder[tab].filter(id=>id!==currentId); }); currentId = (filtered()[0]||messages[0]||{}).id; render(); showToast('消息已删除'); }
 function openSingleDeleteConfirm(){ singleDeleteMask.classList.add('show'); }
 function closeSingleDeleteConfirm(){ singleDeleteMask.classList.remove('show'); }
 function confirmSingleDelete(){ closeSingleDeleteConfirm(); deleteCurrent(); }
 function showToast(t){ toast.textContent=t; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'),1200); }
-function goViewCurrent(){ const m = messages.find(x=>x.id===currentId); showToast(m && m.title.includes('暂未通过审核') ? '进入修改页' : '进入查看页'); }
-function openPreview(icon,title,bg){ previewBox.textContent=icon; previewBox.dataset.title=title; previewBox.style.background=bg; previewMask.classList.add('show'); }
-function closePreview(){ previewMask.classList.remove('show'); }
+function getMessageTargetLabel(message){
+  if(!message) return '查看页';
+  const title = message.title || '';
+  const from = message.from || '';
+  if(title.includes('暂未通过审核')) return '作品修改页';
+  if(title.includes('活动招募')) return '活动主页';
+  if(title.includes('作品集')) return '作品集列表页';
+  if(title.includes('营销信息')) return '营销落地页';
+  if(title.includes('造型库上新') || title.includes('功能模块更新')) return '造型库主页';
+  if(title.includes('课程')) return '课程中心页';
+  if(title.includes('入选官方造型库')) return '造型详情页';
+  if(title.includes('跟拼作品')) return '跟拼作品详情页';
+  if(title.includes('跟拼了你的造型')) return '该造型的跟拼作品列表页';
+  if(title.includes('收藏了你的造型') || title.includes('分享了你的造型')) return '造型详情页';
+  if(from === '作品圈' || title.includes('作品')) return '作品详情页';
+  if(title.includes('V 标')) return '个人主页';
+  return '查看页';
+}
+function goViewCurrent(){ const m = messages.find(x=>x.id===currentId); showToast(`进入${getMessageTargetLabel(m)}`); }
+function openPreview(icon,title,bg,userName='',userAvatar='',userColor='#4B6BFF',targetLabel=''){ previewBox.textContent=icon; previewCaption.textContent=title; previewBox.style.background=bg; previewUser.innerHTML = userName ? `<div class="preview-user-avatar" style="background:${userColor}">${userAvatar || userName.slice(0,1)}</div><span>${userName}</span>` : ''; previewTargetLabel = targetLabel; previewMask.classList.add('show'); }
+function closePreview(){ previewMask.classList.remove('show'); previewTargetLabel = ''; }
+function goPreviewTarget(){ const m = messages.find(x=>x.id===currentId); const label = previewTargetLabel || getMessageTargetLabel(m); closePreview(); showToast(`进入${label}`); }
 function closeDeleteConfirm(){ confirmMask.classList.remove('show'); }
 function confirmDeleteRead(){ const readIds = messages.filter(m=>!m.unread).map(m=>m.id); for(let i=messages.length-1;i>=0;i--){ if(!messages[i].unread) messages.splice(i,1); } Object.keys(sessionOrder).forEach(tab=>{ sessionOrder[tab] = sessionOrder[tab].filter(id=>!readIds.includes(id)); }); closeDeleteConfirm(); currentId=(filtered().find(m=>m.unread)||filtered()[0]||messages[0]||{}).id; render(); showToast('已删除已读消息'); }
 document.getElementById('readAll').onclick = () => { const data = tabMessages(currentTab); if(!data.some(m=>m.unread)){ showToast('当前没有未读消息'); return; } data.forEach(m=>m.unread=false); render(); showToast('已全部标记已读'); };
