@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
 import * as M from '../model.mjs';
-import {renderCenter} from '../center-view.mjs';
+import {renderCenter,visibleEventIds} from '../center-view.mjs';
 
 function render(type,object=M.OBJECTS.wheel,extras={}){
  const state=M.createState();
@@ -43,14 +43,33 @@ test('review keeps its work in the retained single-media area',()=>{
  assert.match(article(html),/class="media-block simple"><div class="work-card"><div class="attach-card"/);
  assert.match(article(html),/data-action="target" >去修改/);
 });
-test('praise retains all individual texts while sharing one source-row thumbnail',()=>{
+test('praise shows a summary and unique users beside the retained object thumbnail',()=>{
  const {state,message}=render('praise',M.OBJECTS.wheel,{text:'第一个夸赞'});
  M.receive(state,{type:'praise',object:M.OBJECTS.wheel,silent:true,actor:{id:'b',name:'可可'},text:'第二个夸赞'});
+ M.receive(state,{type:'praise',object:M.OBJECTS.wheel,silent:true,actor:{id:'a',name:'小宇'},text:'第三个夸赞'});
  const html=renderCenter({state,category:'all',items:M.list(state),selected:message.id});
- assert.match(article(html),/第一个夸赞/);
- assert.match(article(html),/第二个夸赞/);
- assert.equal((article(html).match(/class="center-feedback-row"/g)||[]).length,2);
+ assert.match(article(html),/有2个人夸了夸你的作品/);
+ assert.match(article(html),/小宇和其他1位用户夸了夸你的作品/);
+ assert.match(article(html),/class="avatar-strip"/);
+ assert.equal((article(html).match(/class="avatar-card"/g)||[]).length,2);
+ assert.doesNotMatch(article(html),/第一个夸赞|第二个夸赞|第三个夸赞|center-feedback-row|has-feedback/);
  assert.equal((article(html).match(/class="model-thumb meta-model-thumb"/g)||[]).length,1);
+});
+test('praise reading follows visible users across repeated events and pagination',()=>{
+ const {state,message}=render('praise',M.OBJECTS.wheel,{text:'用户a的夸赞'});
+ for(let i=0;i<60;i++)M.receive(state,{type:'praise',object:M.OBJECTS.wheel,silent:true,actor:{id:'a',name:'小宇'},text:`第${i}条`});
+ M.view(state,message.id,visibleEventIds(state,message,50));
+ assert.equal(M.unread(message),false);
+ for(let i=0;i<51;i++)M.receive(state,{type:'praise',object:M.OBJECTS.wheel,silent:true,actor:{id:`user${i}`,name:`用户${i}`},text:'新的夸赞'});
+ M.view(state,message.id,visibleEventIds(state,message,50));
+ assert.equal(M.unread(message),true);
+ M.view(state,message.id,visibleEventIds(state,message,100));
+ assert.equal(M.unread(message),false);
+});
+test('expert comments continue to display their concrete text',()=>{
+ const {html}=render('expert_comment',M.OBJECTS.wheel,{text:'试试加高底座，看看会有什么变化。'});
+ assert.match(article(html),/试试加高底座，看看会有什么变化。/);
+ assert.match(article(html),/class="center-feedback-row"/);
 });
 test('message controls retain state-driven read and navigation actions',()=>{
  const {state,message}=render('review');

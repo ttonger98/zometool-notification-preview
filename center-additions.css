@@ -1,4 +1,4 @@
-/* New review controls and praise content, alongside the preserved center layout. */
+/* Review controls and expert comments, alongside the preserved center layout. */
 .center-tools {
   position: absolute;
   top: max(6px, env(safe-area-inset-top));

@@ -7,6 +7,14 @@ const artBackground='linear-gradient(135deg,#83b9f0,#daeefe)';
 const icon=(object,imageFail)=>imageFail?'🧩':esc(object.icon);
 const previewAttrs=(object,context='object')=>`${interactive} data-action="preview" data-object="${esc(object.id)}" data-context="${context}" aria-label="预览${esc(object.name)}"`;
 
+export function visibleEventIds(state,message,limit=50){
+ if(M.isInteraction(message)&&!['follow_build','expert_comment'].includes(message.type)){
+  const visibleUsers=new Set(M.users(state,message).slice(0,limit).map(actor=>actor.id));
+  return M.details(state,message).filter(event=>visibleUsers.has(event.actor.id)).map(event=>event.id);
+ }
+ return message.events.slice(0,limit);
+}
+
 function workCard(object,imageFail,context='object',imageClass='attach-card'){
  return `<div class="work-card"><div class="${imageClass}" style="background:${artBackground}" ${previewAttrs(object,context)}>${icon(object,imageFail)}</div><div class="work-name">${imageFail?'默认图 · ':''}${esc(object.name)}</div></div>`;
 }
@@ -21,8 +29,8 @@ function detail(s,m,{detailLimit,networkFail,imageFail}){
  const metaLabel=m.type==='follow_build'?'原造型':m.object.kind==='model'?'造型':'作品';
  const thumb=showThumb?`<div class="model-thumb meta-model-thumb" data-label="${metaLabel}" style="background:${artBackground}" ${previewAttrs(m.object)}>${icon(m.object,imageFail)}</div>`:'';
  let contents='';
- if(['praise','expert_comment'].includes(m.type)){
-  contents=`<div class="center-feedback" aria-label="具体${m.type==='praise'?'夸赞':'评论'}内容">${events.slice(0,detailLimit).map(e=>`<div class="center-feedback-row">${person(e.actor)}<div class="center-feedback-copy"><div class="center-feedback-person"><b>${m.type==='expert_comment'?'共创达人':''}${esc(e.actor.name)}</b><time>${time(e.at)}</time></div><p>${esc(e.text||'这件作品真有创意！')}</p></div></div>`).join('')}${events.length>detailLimit?`<button class="more" data-action="more-detail">查看其余 ${events.length-detailLimit} 条</button>`:''}</div>`;
+ if(m.type==='expert_comment'){
+  contents=`<div class="center-feedback" aria-label="具体评论内容">${events.slice(0,detailLimit).map(e=>`<div class="center-feedback-row">${person(e.actor)}<div class="center-feedback-copy"><div class="center-feedback-person"><b>共创达人${esc(e.actor.name)}</b><time>${time(e.at)}</time></div><p>${esc(e.text||'')}</p></div></div>`).join('')}${events.length>detailLimit?`<button class="more" data-action="more-detail">查看其余 ${events.length-detailLimit} 条</button>`:''}</div>`;
  }else if(m.type==='follow_build'){
   contents=`<div class="followup-gallery"><div class="gallery-scroll">${events.filter(e=>e.work).slice(0,detailLimit).map(e=>workCard({...e.work,name:e.work.name||`【${e.actor.name}】的作品`},imageFail,'work','work-img')).join('')}${events.length>detailLimit?`<button class="more" data-action="more-detail">查看其余 ${events.length-detailLimit} 件</button>`:''}</div></div>`;
  }else if(M.isInteraction(m)){
@@ -47,5 +55,5 @@ export function renderCenter({state:s,category,items,selected,listLimit=20,detai
   return `<div class="nav-item ${c===category?'active':''}" ${interactive} data-action="category" data-category="${c}" aria-current="${c===category?'page':'false'}" aria-label="${label}"><span class="tab-label">${label}</span><span class="tab-badge ${unread?'show':''}">${unread>99?'99+':unread||''}</span></div>`;
  }).join('');
  const list=items.slice(0,listLimit).map(m=>`<div class="mail-item ${M.unread(m)?'unread':'read'} ${m.id===selected?'active':''}" ${interactive} data-action="message" data-id="${m.id}" aria-label="${esc(M.title(s,m))}${M.unread(m)?'，未读':'，已读'}" aria-pressed="${m.id===selected}"><div class="mail-icon">${M.TYPES[m.type][1]}</div><div class="mail-text"><h3 title="${esc(M.title(s,m))}">${esc(M.title(s,m))}</h3><p>${M.formatTime(m.latestAt,s.now)}</p></div></div>`).join('');
- return `<div class="phone-frame"><div class="phone-screen"><div class="dynamic-island"></div><div class="screen-content"><div class="scene"><div class="top-title"><span class="back" ${interactive} data-action="home" aria-label="返回首页">↩</span><span>消息通知</span></div><div class="nav-line"></div><nav class="nav" aria-label="消息分类">${tabs}</nav><section class="mail-shell"><article class="detail-paper ${m&&['praise','expert_comment'].includes(m.type)?'has-feedback':''}" aria-label="消息详情">${detail(s,m,{detailLimit,networkFail,imageFail})}</article></section><aside class="mail-list-panel"><div class="mail-list">${list||`<div class="empty"><i>💌</i><p>${category==='all'?'还没有消息哦，去创作吧～':'暂无消息'}</p></div>`}${items.length>listLimit?'<button class="more" data-action="more-list">加载更多消息</button>':''}</div><div class="panel-actions"><button class="game-btn ${st.unread?'read-active':'disabled'}" data-action="read-all" ${st.unread?'':'disabled'}>一键已读</button><button class="game-btn green" data-action="confirm-read" ${st.read?'':'disabled'}>删除已读</button></div></aside><div class="center-tools"><button class="review-button" data-action="settings">体验设置</button></div></div></div></div></div>`;
+ return `<div class="phone-frame"><div class="phone-screen"><div class="dynamic-island"></div><div class="screen-content"><div class="scene"><div class="top-title"><span class="back" ${interactive} data-action="home" aria-label="返回首页">↩</span><span>消息通知</span></div><div class="nav-line"></div><nav class="nav" aria-label="消息分类">${tabs}</nav><section class="mail-shell"><article class="detail-paper ${m?.type==='expert_comment'?'has-feedback':''}" aria-label="消息详情">${detail(s,m,{detailLimit,networkFail,imageFail})}</article></section><aside class="mail-list-panel"><div class="mail-list">${list||`<div class="empty"><i>💌</i><p>${category==='all'?'还没有消息哦，去创作吧～':'暂无消息'}</p></div>`}${items.length>listLimit?'<button class="more" data-action="more-list">加载更多消息</button>':''}</div><div class="panel-actions"><button class="game-btn ${st.unread?'read-active':'disabled'}" data-action="read-all" ${st.unread?'':'disabled'}>一键已读</button><button class="game-btn green" data-action="confirm-read" ${st.read?'':'disabled'}>删除已读</button></div></aside><div class="center-tools"><button class="review-button" data-action="settings">体验设置</button></div></div></div></div></div>`;
 }

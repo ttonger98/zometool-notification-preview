@@ -1,5 +1,5 @@
 import * as M from './model.mjs';
-import {renderCenter} from './center-view.mjs?v=20260910-layout1';
+import {renderCenter,visibleEventIds} from './center-view.mjs?v=praise-summary1';
 const KEY='zometool-notification-demo-20260910',LAUNCH=KEY+'-launch';
 const $=id=>document.getElementById(id),esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function load(){try{const data=JSON.parse(localStorage.getItem(KEY));if(data?.version===M.VERSION)return data;}catch{}return M.seeded();}
@@ -14,7 +14,7 @@ function toast(text){$('toast').textContent=text;$('toast').classList.add('show'
 function persist(){try{localStorage.setItem(KEY,JSON.stringify(state));sessionStorage.setItem(LAUNCH,JSON.stringify(launch));}catch{toast('当前以临时会话保存体验状态');}}
 async function mutate(fn){const work=async()=>{state=load();await fn(state);persist();render();};return navigator.locks?navigator.locks.request(KEY,work):work();}
 function ordered(){const all=M.list(state,category),ids=new Set(all.map(m=>m.id));const fresh=all.filter(m=>!order.includes(m.id)).map(m=>m.id);order=[...fresh,...order.filter(id=>ids.has(id))];return order.map(id=>M.findMessage(state,id));}
-function selectCurrent(s,id){selected=id;detailLimit=50;const m=M.findMessage(s,id);if(m&&!networkFail)M.view(s,id,m.events.slice(0,detailLimit));}
+function selectCurrent(s,id){selected=id;detailLimit=50;const m=M.findMessage(s,id);if(m&&!networkFail)M.view(s,id,visibleEventIds(s,m,detailLimit));}
 async function center(cat='all'){await mutate(s=>{page='center';category=cat;order=M.list(s,cat).map(m=>m.id);listLimit=20;selectCurrent(s,order[0]);settings=false;popupId=null;});}
 function header(title,back='home'){return `<header class="header"><h1>${page==='home'?'':`<button class="back" data-action="${back}" aria-label="返回">↩</button>`}${title}</h1><div class="header-actions">${page==='home'?`<button class="bell" data-action="center" aria-label="消息中心">消息 🔔${badge(M.stats(state).unread)}</button>`:''}<span class="build">需求同步版 · 09.10</span><button class="review-button" data-action="settings">体验设置</button></div></header>`;}
 function home(){return `${header('ZOMETOOL')}<section class="home"><div class="welcome"><div><h2>今天，也来拼出新发现！</h2><p>创作、分享，收获小伙伴的鼓励。</p></div></div><div class="tiles">${[['🧩','造型库','跟着创意一起拼','library'],['🚀','作品圈','看看大家的精彩创作','works'],['📚','课程','发现更多拼搭方法','courses']].map(([icon,name,sub,key])=>`<button class="tile" data-action="home-target" data-target="${key}"><i>${icon}</i>${name}<small>${sub}</small></button>`).join('')}</div><p class="home-note">首页背景与业务目标页为交互示意。消息中心、重要提醒和状态联动使用本版规则。</p></section>`;}
@@ -80,7 +80,7 @@ async function act(action,node){
  if(action==='cancel-confirm'){confirm=null;render();return;}
  if(action==='delete'){await mutate(s=>{const ids=ordered().map(m=>m.id),i=ids.indexOf(selected);if(confirm==='read')M.removeRead(s,category);else M.remove(s,selected);confirm=null;const available=new Set(M.list(s,category).map(m=>m.id));selectCurrent(s,ids.slice(i).find(id=>available.has(id))||ids.slice(0,i).reverse().find(id=>available.has(id)));});toast('消息列表已更新');return;}
  if(action==='more-list'){listLimit+=20;render();return;}
- if(action==='more-detail'){detailLimit+=50;await mutate(s=>{const m=M.findMessage(s,selected);if(m)M.view(s,m.id,m.events.slice(0,detailLimit));});return;}
+ if(action==='more-detail'){detailLimit+=50;await mutate(s=>{const m=M.findMessage(s,selected);if(m)M.view(s,m.id,visibleEventIds(s,m,detailLimit));});return;}
  if(action==='generate'){await mutate(s=>{const actor={id:actorName?'custom-'+actorName:'visitor-'+(++s.seq),name:actorName||'小伙伴'+s.seq,color:['#ec977b','#80b191','#8997d6'][s.seq%3]};let object=M.OBJECTS[objectId];if(!M.allowedKinds(type).includes(object.kind))object=Object.values(M.OBJECTS).find(o=>M.allowedKinds(type).includes(o.kind));const text=type==='praise'?'这件作品太有创意了！':type==='expert_comment'?'结构很稳定，试试加高底座看看吧！':undefined;M.receive(s,{type,object,actor,text,work:type==='follow_build'?{id:'work-'+s.seq,name:`${actor.name}的作品`,icon:'🌁'}:undefined,popup:!M.INTERACTIONS.includes(type)&&type!=='review'});});toast('新消息已进入消息中心');return;}
  if(action==='advance'){await mutate(s=>M.advance(s,Number(node.dataset.minutes)*M.MINUTE));return;}
  if(action==='time-seven'){await mutate(s=>{s.now=Date.parse(M.localDate(s.now+M.DAY)+'T07:00:00+08:00');M.flushQueue(s);});return;}
