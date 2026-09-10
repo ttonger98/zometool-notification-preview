@@ -1,0 +1,47 @@
+/* New review controls and praise content, alongside the preserved center layout. */
+.center-tools {
+  position: absolute;
+  top: max(6px, env(safe-area-inset-top));
+  right: max(24px, env(safe-area-inset-right));
+  z-index: 5;
+}
+.center-tools .review-button { padding: 5px 9px; font-size: 10px; }
+.detail-paper.has-feedback { display: flex; flex-direction: column; }
+.has-feedback > .detail-head,
+.has-feedback > .meta-row,
+.has-feedback > .mail-body { flex-shrink: 0; }
+.center-feedback {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  margin-top: 10px;
+  padding: 2px;
+  scrollbar-width: thin;
+}
+.center-feedback-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px;
+  margin-bottom: 8px;
+  background: #f2f9fd;
+  border-radius: 14px;
+}
+.center-feedback-row .avatar-card { flex: 0 0 38px; }
+.center-feedback-row .avatar-face { width: 38px; height: 38px; font-size: 19px; }
+.center-feedback-row .avatar-name { display: none; }
+.center-feedback-copy { flex: 1; min-width: 0; }
+.center-feedback-person { display: flex; flex-wrap: wrap; gap: 4px 10px; justify-content: space-between; font-size: 13px; }
+.center-feedback-person time { font-size: 10px; color: #89919c; white-space: nowrap; }
+.center-feedback-copy p { margin: 4px 0 0; font-size: 14px; line-height: 1.5; }
+[role="button"][data-action] { cursor: pointer; }
+[role="button"][data-action]:focus-visible { outline: 3px solid #166cb5; outline-offset: 2px; }
+@media (orientation: landscape) and (max-height: 520px) {
+  .center-feedback { margin-top: 6px; }
+  .center-feedback-row { gap: 7px; padding: 7px; margin-bottom: 5px; border-radius: 10px; }
+  .center-feedback-row .avatar-card { flex-basis: 27px; }
+  .center-feedback-row .avatar-face { width: 27px; height: 27px; font-size: 15px; }
+  .center-feedback-person { font-size: 11px; }
+  .center-feedback-person time { font-size: 9px; }
+  .center-feedback-copy p { font-size: 12px; }
+}
