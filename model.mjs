@@ -1,6 +1,6 @@
 // One deterministic domain model drives the center, simulated Push, and home reminders.
 export const MINUTE=60_000, HOUR=60*MINUTE, DAY=24*HOUR;
-export const VERSION='2026-09-17-feedback';
+export const VERSION='2026-09-18-read-first-follow';
 export const INTERACTIONS=['like','favorite','share','follow_build','praise','expert_comment','follow'];
 export const PERSONAL=['admission','honor','growth_star','selected'];
 export const TYPES={
@@ -59,17 +59,24 @@ export function target(m,context='main'){
 // Ordinary notifications share one account-wide allowance. Personal results bypass it.
 export function round(s){const r=s.ordinaryRound;return r&&s.now<r.start+2*HOUR?{...r,remaining:2-r.used,ends:r.start+2*HOUR}:{used:0,remaining:2,start:null,ends:null};}
 export const personal=m=>PERSONAL.includes(m.type);
+export const personalPush=e=>personal(e)||e.specialPush==='first_follow';
 const pushGate=s=>s.loggedIn&&s.notifications&&s.mode==='background'&&sendingHours(s.now);
-const priority=e=>personal(e)?0:e.type==='review'?1:!isInteraction(e)?2:e.type==='expert_comment'?3:4;
-function pushEligible(s,m){return pushGate(s)&&(personal(m)||(round(s).remaining>0&&(s.lastPush===null||s.now-s.lastPush>=MINUTE)));}
+const priority=e=>personal(e)?0:e.specialPush==='first_follow'?1:!isInteraction(e)&&e.type!=='review'?2:e.type==='expert_comment'?3:e.type==='review'?5:4;
+function pushEligible(s,e){return pushGate(s)&&(personalPush(e)||(round(s).remaining>0&&(s.lastPush===null||s.now-s.lastPush>=MINUTE)));}
 function eventMessage(s,e){return s.messages.find(m=>m.id===e.messageId);}
 function pending(s,e){const m=eventMessage(s,e);return !e.handled&&!e.viewed&&m&&valid(s,m)&&m.targetAvailable;}
 function recordPush(s,m,events){
  events=[...events].sort((a,b)=>a.at-b.at||a.id.localeCompare(b.id));
  const latest=events.at(-1),n=new Set(events.map(e=>e.actor.id)).size;
  const push={id:`push-${++s.seq}`,messageId:m.id,type:m.type,at:s.now,eventIds:events.map(e=>e.id),latestEventId:latest.id,title:isInteraction(m)?(n>1?`${latest.actor.name}等${n}位小伙伴`:`${latest.actor.name}`)+({like:'赞了',favorite:'收藏了',share:'分享了',follow_build:'跟拼了',praise:'夸了夸',expert_comment:'评论了',follow:'关注了'}[m.type])+(m.type==='follow'?'你':`你的${objectLabel(m)}「${m.object.name}」`):title(s,m)};
- if(!personal(m)){const r=round(s);s.ordinaryRound={start:r.start??s.now,used:r.used+1};}
- push.body=pushGuide(m.type);events.forEach(e=>e.handled=true);s.pushes.push(push);if(!personal(m))s.lastPush=s.now;return push;
+ push.specialPush=latest.specialPush||null;
+ if(latest.specialPush==='first_follow'){
+  push.title='你的创意，第一次有人跟着拼啦！';
+  push.body=`${latest.actor.name}跟拼了你的造型「${m.object.name}」。去看看TA的作品吧！`;
+  if(s.firstFollow)s.firstFollow.locked=true;
+ }else push.body=m.type==='follow'&&n>1?'来看看，哪些新朋友关注了你。':pushGuide(m.type);
+ if(!personalPush(latest)){const r=round(s);s.ordinaryRound={start:r.start??s.now,used:r.used+1};}
+ events.forEach(e=>e.handled=true);s.pushes.push(push);if(!personalPush(latest))s.lastPush=s.now;return push;
 }
 export function clickPush(s,id){if(!s.pushes.some(p=>p.id===id))return false;s.ordinaryRound=null;s.mode='foreground';return true;}
 function releaseAt(t){const hour=new Date(t+8*HOUR).getUTCHours();return Date.parse(localDate(t+(hour>=21?DAY:0))+'T07:00:00+08:00');}
@@ -81,7 +88,7 @@ export function flushQueue(s,incoming=null){
  let sent=null;
  if(quiet.length){
   const candidates=quiet.filter(e=>pending(s,e)).sort((a,b)=>priority(a)-priority(b)||b.at-a.at||b.id.localeCompare(a.id));
-  const e=candidates[0];if(e&&!pushEligible(s,eventMessage(s,e)))return null;
+  const e=candidates[0];if(e&&!pushEligible(s,e))return null;
   if(e)sent=recordPush(s,eventMessage(s,e),[e]);
   quiet.forEach(e=>{e.quietReleased=true;e.handled=true;});
   s.queue=s.queue.filter(id=>!quiet.some(e=>e.id===id));
@@ -91,10 +98,10 @@ export function flushQueue(s,incoming=null){
  if(incoming&&pending(s,incoming)&&!incoming.quietUntil)candidates.push(incoming);
  candidates.sort((a,b)=>priority(a)-priority(b)||b.at-a.at||b.id.localeCompare(a.id));
  for(const e of candidates){
-  const m=eventMessage(s,e);if(!pushEligible(s,m))continue;
-  const events=isInteraction(m)?s.events.filter(x=>x.type===e.type&&x.object.id===e.object.id&&pending(s,x)&&(!x.quietUntil||x.quietReleased)):[e];
+  const m=eventMessage(s,e);if(!pending(s,e)||!pushEligible(s,e))continue;
+  const events=isInteraction(m)&&!personalPush(e)?s.events.filter(x=>x.type===e.type&&x.object.id===e.object.id&&!personalPush(x)&&pending(s,x)&&(!x.quietUntil||x.quietReleased)):[e];
   sent=recordPush(s,m,events);s.queue=s.queue.filter(id=>!events.some(x=>x.id===id));
-  if(!personal(m))break;
+  if(!personalPush(e))break;
  }
  return sent;
 }
@@ -103,9 +110,10 @@ function registerFirstFollow(s,m,e){
  if(e.type!=='follow_build'||!e.work||e.actor.id===s.account)return;
  const first=s.firstFollow;if(first?.historical||first?.locked)return;
  if(first&&(first.at<e.at||(first.at===e.at&&first.eventId.localeCompare(e.id)<=0)))return;
- if(first){const old=findMessage(s,first.messageId);if(old){old.popup=false;old.popupPersistent=false;}}
+ if(first){const previous=s.events.find(x=>x.id===first.eventId);if(previous)delete previous.specialPush;const old=findMessage(s,first.messageId);if(old){old.popup=false;old.popupPersistent=false;}}
  s.firstFollow={messageId:m.id,eventId:e.id,at:e.at,locked:false};
  m.popup=true;m.popupPersistent=true;m.popupKind='first_follow';m.popupState='pending';m.firstFollowEventId=e.id;
+ e.specialPush='first_follow';
 }
 export function popupValid(s,m){return !m.deleted&&!m.offline&&m.targetAvailable&&(m.popupPersistent||valid(s,m));}
 export function receive(s,input){
@@ -115,13 +123,18 @@ export function receive(s,input){
  if(input.approved===false||input.formal===false||input.valid===false)return null;
  if(input.id&&s.events.some(e=>e.id===input.id))return eventMessage(s,s.events.find(e=>e.id===input.id));
  const object={...(input.object||OBJECTS.wheel)},at=input.at??s.now,actor=input.actor||{id:'official',name:'Zometool官方',color:'#4ea5df'};
- const prior=s.events.find(e=>e.type===type&&e.object.id===object.id&&e.actor.id===actor.id&&((['like','favorite'].includes(type)&&localDate(e.at)===localDate(at))||type==='follow_build'));
- if(prior&&['like','favorite'].includes(type))return eventMessage(s,prior);
- if(prior&&type==='follow_build'&&(!input.work||details(s,eventMessage(s,prior)).some(e=>e.work?.id===input.work.id)))return eventMessage(s,prior);
+ const prior=s.events.find(e=>e.type===type&&e.object.id===object.id&&e.actor.id===actor.id);
+ if(prior&&['like','favorite','follow'].includes(type))return eventMessage(s,prior);
+ if(type==='follow_build'){
+  const repeat=s.events.find(e=>e.type===type&&e.actor.id===actor.id&&e.object.id===object.id&&e.work?.id===input.work?.id);
+  if(repeat)return eventMessage(s,repeat);
+  // The demo can identify a deleted/reuploaded work without hiding genuinely new works.
+  const original=input.reuploadOf&&s.events.find(e=>e.work?.id===input.reuploadOf&&e.actor.id===actor.id&&e.object.id===object.id);
+  if(original&&at>=original.at&&at-original.at<DAY)return eventMessage(s,original);
+ }
  const interaction=INTERACTIONS.includes(type),aggregate=interaction&&type!=='expert_comment';
- let m=aggregate?s.messages.findLast(m=>valid(s,m)&&m.type===type&&m.object.id===object.id&&at>=m.createdAt&&at-m.createdAt<HOUR):null;
- if(prior&&type==='follow_build'&&valid(s,eventMessage(s,prior)))m=eventMessage(s,prior);
- const e={...input,id:input.id||`event-${++s.seq}`,type,at,object,actor,handled:!!prior,viewed:false};
+ let m=aggregate?s.messages.findLast(m=>valid(s,m)&&unread(m)&&m.type===type&&m.object.id===object.id&&at>=m.createdAt&&at-m.createdAt<HOUR):null;
+ const e={...input,id:input.id||`event-${++s.seq}`,type,at,object,actor,handled:false,viewed:false};
  if(!m){
   m={id:`message-${++s.seq}`,order:s.seq,type,object,category:interaction?'feedback':'system',source:interaction?(object.kind==='model'||object.kind==='remix'?'造型库':'作品圈'):'Zometool官方',createdAt:at,latestAt:at,expiresAt:Math.min(at+90*DAY,input.expiresAt??Infinity),events:[],readIds:[],popup:PERSONAL.includes(type)||(input.popup===true&&!interaction&&type!=='review'),popupState:'pending',popupStart:input.popupStart??at,popupEnd:input.popupEnd??(input.expiresAt??at+90*DAY),popupPersistent:PERSONAL.includes(type),targetAvailable:true,title:interaction?undefined:input.title,text:interaction?undefined:input.text};
   s.messages.push(m);
@@ -131,17 +144,28 @@ export function receive(s,input){
  if(input.silent)return m;
  if(input.push!==false){
   if(!sendingHours(s.now)){e.quietUntil=releaseAt(s.now);}
-  else if(!interaction)s.queue.push(e.id);
-  flushQueue(s,interaction&&!prior?e:null);
+  else if(!interaction||personalPush(e))s.queue.push(e.id);
+  flushQueue(s,interaction?e:null);
  }
  return m;
 }
-export function view(s,id,eventIds){
+export function view(s,id){
  const m=findMessage(s,id);if(!m||(!valid(s,m)&&!popupValid(s,m)))return false;
- const ids=eventIds||m.events;
+ const ids=m.events;
  m.readIds=[...new Set([...m.readIds,...ids.filter(id=>m.events.includes(id))])];
  s.events.filter(e=>ids.includes(e.id)).forEach(e=>{e.viewed=true;e.handled=true;});
  completeReminder(s,m);return true;
+}
+// Sort feedback from the same received batch before choosing the first celebration.
+export function receiveBatch(s,inputs){
+ const mode=s.mode;s.mode='foreground';
+ const messages=[...inputs].sort((a,b)=>(a.at??s.now)-(b.at??s.now)||String(a.id||'').localeCompare(String(b.id||''))).map(input=>receive(s,input));
+ s.mode=mode;flushQueue(s);return messages;
+}
+export function pushDestination(s,p){
+ const m=findMessage(s,p.messageId),events=p.eventIds.map(id=>s.events.find(e=>e.id===id)).filter(Boolean);
+ if(m?.type==='follow'&&new Set(events.map(e=>e.actor.id)).size>1)return {kind:'message',messageId:m.id};
+ return {kind:'target',messageId:m?.id,actor:m?.type==='follow'?events.at(-1)?.actor:null,commentId:m?.type==='praise'?p.latestEventId:null};
 }
 function completeReminder(s,m){m.popupState='completed';if(m.popupKind==='first_follow'&&s.firstFollow)s.firstFollow.locked=true;}
 export function readAll(s,category){list(s,category).forEach(m=>{m.readIds=[...m.events];if(!m.popupPersistent)completeReminder(s,m);});}

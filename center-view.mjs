@@ -1,5 +1,5 @@
-import {honorBanner} from './honor-visual.mjs?v=20260917-feedback1';
-import * as M from './model.mjs?v=20260917-feedback1';
+import {honorBanner} from './honor-visual.mjs?v=20260918-feedback2';
+import * as M from './model.mjs?v=20260918-feedback2';
 
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const interactive='role="button" tabindex="0"';
@@ -47,7 +47,7 @@ function detail(s,m,{detailLimit,networkFail,imageFail}){
   contents=`<div class="activity-banner" ${interactive} data-action="target" aria-label="查看${esc(M.title(s,m))}" style="background:linear-gradient(135deg,#5D8CFF,#BFE8FF 55%,#FFE5A8)"><div class="banner-copy"><div class="banner-label">${esc(M.TYPES[m.type][0])}</div><b>${esc(M.title(s,m))}</b><span>${esc(M.body(s,m))}</span></div><div class="banner-icon">${M.TYPES[m.type][1]}</div></div>`;
  }
  const action=m.type==='follow'?'':`<button class="goto-mail" data-action="target" ${m.targetAvailable?'':'disabled'}>${m.targetAvailable?(m.type==='review'?'去修改':m.type==='honor'?'查看我的身份':m.type==='growth_star'?'看看我的成长故事':'去看看'):'内容已下架'}</button>`;
- return `<div class="detail-head"><h2 class="detail-title">${esc(M.title(s,m))}</h2><div class="detail-time">${time(m.latestAt)}</div></div><div class="meta-row"><span>来自：${esc(m.source)}</span>${thumb}</div><div class="mail-body">${M.unread(m)?'<button class="new-content" data-action="read-new">有新的互动 · 阅读新增内容</button>':''}${['honor','growth_star'].includes(m.type)?esc(M.body(s,m)).replace(m.type==='honor'?'共创达人':'成长之星',`<button class="inline-honor-link" data-action="target">${m.type==='honor'?'共创达人':'成长之星'}</button>`):esc(M.body(s,m))}</div>${contents}<div class="detail-actions">${action}<button class="delete-mail" data-action="confirm-single">删除消息</button></div>`;
+ return `<div class="detail-head"><h2 class="detail-title">${esc(M.title(s,m))}</h2><div class="detail-time">${time(m.latestAt)}</div></div><div class="meta-row"><span>来自：${esc(m.source)}</span>${thumb}</div><div class="mail-body">${['honor','growth_star'].includes(m.type)?esc(M.body(s,m)).replace(m.type==='honor'?'共创达人':'成长之星',`<button class="inline-honor-link" data-action="target">${m.type==='honor'?'共创达人':'成长之星'}</button>`):esc(M.body(s,m))}</div>${contents}<div class="detail-actions">${action}<button class="delete-mail" data-action="confirm-single">删除消息</button></div>`;
 }
 
 // Match the original prototype's DOM so center.css remains the layout authority.

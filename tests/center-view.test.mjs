@@ -55,16 +55,15 @@ test('praise shows a summary and unique users beside the retained object thumbna
  assert.doesNotMatch(article(html),/第一个夸赞|第二个夸赞|第三个夸赞|center-feedback-row|has-feedback/);
  assert.equal((article(html).match(/class="model-thumb meta-model-thumb"/g)||[]).length,1);
 });
-test('praise reading follows visible users across repeated events and pagination',()=>{
+test('praise pagination never changes whole-message read status',()=>{
  const {state,message}=render('praise',M.OBJECTS.wheel,{text:'用户a的夸赞'});
- for(let i=0;i<60;i++)M.receive(state,{type:'praise',object:M.OBJECTS.wheel,silent:true,actor:{id:'a',name:'小宇'},text:`第${i}条`});
+ for(let i=0;i<60;i++)M.receive(state,{type:'praise',object:M.OBJECTS.wheel,silent:true,actor:{id:'user'+i,name:'用户'+i},text:'夸赞'});
+ assert.equal(visibleEventIds(state,message,50).length,50);
  M.view(state,message.id,visibleEventIds(state,message,50));
  assert.equal(M.unread(message),false);
- for(let i=0;i<51;i++)M.receive(state,{type:'praise',object:M.OBJECTS.wheel,silent:true,actor:{id:`user${i}`,name:`用户${i}`},text:'新的夸赞'});
- M.view(state,message.id,visibleEventIds(state,message,50));
- assert.equal(M.unread(message),true);
- M.view(state,message.id,visibleEventIds(state,message,100));
- assert.equal(M.unread(message),false);
+ assert.equal(message.readIds.length,61);
+ const next=M.receive(state,{type:'praise',object:M.OBJECTS.wheel,silent:true,actor:{id:'new',name:'新朋友'},text:'新的夸赞'});
+ assert.notEqual(next.id,message.id);assert.equal(M.unread(next),true);assert.equal(M.unread(message),false);
 });
 test('expert comments continue to display their concrete text',()=>{
  const {html}=render('expert_comment',M.OBJECTS.wheel,{text:'试试加高底座，看看会有什么变化。'});
