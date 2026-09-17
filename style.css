@@ -163,3 +163,27 @@ a{color:#367bb0}
 .close{width:32px;height:32px}
 .badge{font-size:10px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* Distinct creator honors: landscape Banner cards, not oversized medal icons. */
+.honor-dialog{width:min(690px,calc(100vw - 48px));max-height:calc(100dvh - 24px);padding:17px 20px 18px;border-radius:24px;text-align:left;overflow:auto;background:#fffdf8;box-sizing:border-box}
+.honor-source{font-size:11px;font-weight:700;color:#7d766a;letter-spacing:.8px;margin:0 0 10px 2px}.honor-dialog .close{top:8px;right:10px;z-index:5;width:28px;height:28px;font-size:23px}
+.honor-banner{height:195px;position:relative;border-radius:15px;overflow:hidden;background:#152e54;color:#fff}.maker-banner{background:radial-gradient(ellipse at 70% 85%,#344768,transparent 70%),linear-gradient(110deg,#122340,#213553)}
+.honor-banner .banner-copy{position:absolute;z-index:2;left:24px;top:21px;display:flex;flex-direction:column;align-items:flex-start;gap:10px}.honor-banner .banner-kicker{font-size:10px;letter-spacing:1.4px;color:#dfc594;font-weight:600}.honor-banner .banner-copy strong{font-size:30px;line-height:1.2;letter-spacing:1px}.honor-banner .banner-caption{font-size:12px;color:#dce8ed}.maker-art{position:absolute;right:7px;top:-2px;height:205px;width:285px;filter:drop-shadow(0 9px 10px #06112366)}.maker-seal{position:absolute;bottom:14px;right:20px;border:1px solid #eac77888;border-radius:20px;padding:5px 12px;color:#ffe4a7;background:#12294ecc;font-size:11px}
+.star-banner{background:#192f47}.star-photo{position:absolute;right:0;top:0;width:59%;height:100%;object-fit:cover;object-position:50% 57%}.star-shade{position:absolute;inset:0;background:linear-gradient(90deg,#182e48 26%,#182e48ee 37%,#182e4800 65%)}.star-banner .banner-copy{max-width:55%}.star-banner .banner-kicker{color:#fee3a0}.star-seal{position:absolute;right:12px;top:12px;width:66px;height:auto;max-height:45px;object-fit:contain}.star-banner .banner-caption{background:#18334b99;padding:3px 0}
+.honor-message{display:flex;align-items:center;gap:20px;padding:13px 2px 0}.honor-message>div{flex:1;min-width:0}.honor-dialog h2{margin:0 0 5px;font-size:19px;line-height:1.3;color:#273b51}.honor-dialog .body-copy{font-size:12px;line-height:1.6;color:#64727d;margin:0;max-width:440px}.honor-cta{flex:none;font-size:13px;min-height:42px;padding:10px 18px;border-radius:14px;white-space:nowrap}.push-copy{display:block;color:#586776;font-size:15px;line-height:1.55;margin-top:7px;text-align:left;white-space:normal}.push-item strong{white-space:normal;line-height:1.5}.phone-notifications{max-width:610px;margin:16px auto}
+@media(max-height:390px){.honor-banner{height:177px}.honor-dialog{padding-top:12px;padding-bottom:12px}.honor-banner .banner-copy strong{font-size:28px}.honor-message{padding-top:10px}}
+@media(max-width:650px){.honor-dialog{width:calc(100vw - 24px)}.honor-banner{height:190px}.honor-banner .banner-copy{left:15px;max-width:62%}.honor-banner .banner-copy strong{font-size:24px}.maker-art{right:-40px;opacity:.6}.honor-message{gap:8px}.honor-cta{padding:10px}.star-photo{width:64%}}
+
+.center-honor-visual{margin:6px 0;cursor:pointer}.center-root .honor-banner{height:112px;border-radius:10px}.center-root .honor-banner .banner-copy{left:15px;top:12px;gap:4px}.center-root .honor-banner .banner-copy strong{font-size:20px}.center-root .honor-banner .banner-kicker{font-size:8px}.center-root .honor-banner .banner-caption{font-size:10px}.center-root .maker-art{height:120px;right:-12px;width:175px}.center-root .maker-seal{font-size:9px;bottom:6px}.center-root .star-seal{width:45px}.inline-honor-link{border:0;padding:0;background:none;color:#267ab4;text-decoration:underline;font:inherit;cursor:pointer}
+
+.detail-paper:has(.center-honor-visual) .goto-mail{width:auto;min-width:86px;padding:0 16px;white-space:nowrap}
+
+.detail-paper:has(.center-honor-visual) .goto-mail{width:auto!important;max-width:none!important;min-width:86px!important;padding:0 13px!important;white-space:nowrap!important}
+
+/* First follow-build: show the creative response, with both objects kept inside a landscape dialog. */
+.first-follow-dialog{width:min(640px,calc(100vw - 48px));max-height:calc(100dvh - 24px);padding:13px 24px;overflow:auto}
+.first-follow-dialog .source{font-size:11px}.first-follow-dialog h2{font-size:23px;margin:5px 0}.first-follow-dialog .body-copy{font-size:13px;margin:6px 0;line-height:1.5}
+.follow-visual{display:grid;grid-template-columns:1fr 36px 1fr;align-items:center;gap:12px;margin:8px 0}
+.follow-original,.follow-result{min-width:0;border:1px solid #dce8ee;border-radius:16px;background:#f2f7fb;padding:3px 8px 10px;display:flex;flex-direction:column;align-items:center}
+.follow-result{background:#fff6df;border-color:#f1ddb0}.follow-visual svg{height:130px;width:100%;max-width:180px}.follow-visual span{font-size:11px;color:#748391}.follow-visual strong{font-size:14px;color:#324964;max-width:100%;overflow-wrap:anywhere}.follow-arrow{font-size:27px;color:#b8a46d}.first-follow-dialog .dialog-actions{margin-top:8px}.first-follow-dialog .btn{font-size:13px;padding:9px 19px}
+@media(max-height:390px){.first-follow-dialog{padding:9px 22px}.follow-visual svg{height:109px}.first-follow-dialog h2{font-size:21px}}
