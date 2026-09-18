@@ -1,6 +1,6 @@
 // One deterministic domain model drives the center, simulated Push, and home reminders.
 export const MINUTE=60_000, HOUR=60*MINUTE, DAY=24*HOUR;
-export const VERSION='2026-09-18-read-first-follow';
+export const VERSION='2026-09-18-priority-first-record';
 export const INTERACTIONS=['like','favorite','share','follow_build','praise','expert_comment','follow'];
 export const PERSONAL=['admission','honor','growth_star','selected'];
 export const TYPES={
@@ -25,6 +25,7 @@ export const details=(s,m)=>m.events.map(id=>s.events.find(e=>e.id===id)).filter
 export const users=(s,m)=>[...new Map(details(s,m).map(e=>[e.actor.id,e.actor])).values()];
 export const objectLabel=m=>({model:'造型',work:'作品',remix:'跟拼作品',profile:'主页'}[m.object.kind]||'作品');
 export function title(s,m){
+ if(m.popupKind==='first_follow')return '你的创意，第一次有人跟着拼啦！';
  const n=users(s,m).length,obj=objectLabel(m),person=n===1?'有人':`有${n}个人`;
  if(m.type==='like')return `${person}赞了你的${obj}`;
  if(m.type==='favorite')return `${person}收藏了你的${obj}`;
@@ -36,6 +37,7 @@ export function title(s,m){
  return m.title||({admission:'恭喜！你的造型入选官方造型库啦！',honor:'恭喜你成为共创达人！',growth_star:'你是本月的成长之星！',selected:'你的作品入选主题合集啦！',review:'作品需要调整一下',activity:'新一期活动招募开始啦！',collection:'新一期优秀作品集上线啦！',model_batch:'造型库上新造型啦！',course:'新课程上线啦！',feature:'造型库功能更新啦！',marketing:'创意拼搭活动开始啦！'}[m.type]);
 }
 export function body(s,m){
+ if(m.popupKind==='first_follow'){const e=details(s,m)[0];return `${e.actor.name}跟着你的「${m.object.name}」拼出了新作品。`;}
  if(m.text)return m.text;
  if(isInteraction(m)){
   const u=users(s,m),who=u.length>1?`${u[0].name}和其他${u.length-1}位用户`:u[0]?.name||'小伙伴';
@@ -61,7 +63,17 @@ export function round(s){const r=s.ordinaryRound;return r&&s.now<r.start+2*HOUR?
 export const personal=m=>PERSONAL.includes(m.type);
 export const personalPush=e=>personal(e)||e.specialPush==='first_follow';
 const pushGate=s=>s.loggedIn&&s.notifications&&s.mode==='background'&&sendingHours(s.now);
-const priority=e=>personal(e)?0:e.specialPush==='first_follow'?1:!isInteraction(e)&&e.type!=='review'?2:e.type==='expert_comment'?3:e.type==='review'?5:4;
+const firstFollow=e=>e.specialPush==='first_follow'||e.popupKind==='first_follow';
+const priority=e=>personal(e)?0:firstFollow(e)?1:!isInteraction(e)&&e.type!=='review'?2:e.type==='expert_comment'?3:e.type==='review'?5:4;
+const typePriority=e=>{
+ if(personal(e))return {honor:0,growth_star:0,selected:1,admission:2}[e.type];
+ if(firstFollow(e))return 0;
+ if(!isInteraction(e))return ['activity','model_batch','collection','feature','course','marketing','review'].indexOf(e.type);
+ const kind={model:0,work:1,remix:2,profile:0}[e.object.kind];
+ return e.type==='expert_comment'?kind:['follow_build','praise','follow','favorite','like','share'].indexOf(e.type)*3+kind;
+};
+// The same channel ordering applies before time is used as a tie-breaker.
+export const compareNotifications=(a,b)=>priority(a)-priority(b)||typePriority(a)-typePriority(b)||(b.at??b.latestAt)-(a.at??a.latestAt)||(b.order??0)-(a.order??0)||String(b.id).localeCompare(String(a.id));
 function pushEligible(s,e){return pushGate(s)&&(personalPush(e)||(round(s).remaining>0&&(s.lastPush===null||s.now-s.lastPush>=MINUTE)));}
 function eventMessage(s,e){return s.messages.find(m=>m.id===e.messageId);}
 function pending(s,e){const m=eventMessage(s,e);return !e.handled&&!e.viewed&&m&&valid(s,m)&&m.targetAvailable;}
@@ -87,7 +99,7 @@ export function flushQueue(s,incoming=null){
  const quiet=s.events.filter(e=>e.quietUntil&&e.quietUntil<=s.now&&!e.quietReleased);
  let sent=null;
  if(quiet.length){
-  const candidates=quiet.filter(e=>pending(s,e)).sort((a,b)=>priority(a)-priority(b)||b.at-a.at||b.id.localeCompare(a.id));
+  const candidates=quiet.filter(e=>pending(s,e)).sort(compareNotifications);
   const e=candidates[0];if(e&&!pushEligible(s,e))return null;
   if(e)sent=recordPush(s,eventMessage(s,e),[e]);
   quiet.forEach(e=>{e.quietReleased=true;e.handled=true;});
@@ -95,8 +107,12 @@ export function flushQueue(s,incoming=null){
   if(sent)return sent;
  }
  const candidates=s.queue.map(id=>s.events.find(e=>e.id===id)).filter(e=>pending(s,e)&&!e.quietUntil);
- if(incoming&&pending(s,incoming)&&!incoming.quietUntil)candidates.push(incoming);
- candidates.sort((a,b)=>priority(a)-priority(b)||b.at-a.at||b.id.localeCompare(a.id));
+ if(incoming&&pending(s,incoming)&&!incoming.quietUntil){
+  // A new interaction can trigger an eligible older interaction of higher priority.
+  // Merely advancing the clock still does not send an ordinary interaction.
+  candidates.push(...s.events.filter(e=>isInteraction(e)&&pending(s,e)&&!e.quietUntil));
+ }
+ candidates.sort(compareNotifications);
  for(const e of candidates){
   const m=eventMessage(s,e);if(!pending(s,e)||!pushEligible(s,e))continue;
   const events=isInteraction(m)&&!personalPush(e)?s.events.filter(x=>x.type===e.type&&x.object.id===e.object.id&&!personalPush(x)&&pending(s,x)&&(!x.quietUntil||x.quietReleased)):[e];
@@ -106,11 +122,15 @@ export function flushQueue(s,incoming=null){
  return sent;
 }
 export function seedHistoricalFollow(s){s.firstFollow={historical:true,locked:true};}
+function isFirstFollowCandidate(s,e){
+ const first=s.firstFollow;
+ return e.type==='follow_build'&&!!e.work&&e.actor.id!==s.account&&!first?.historical&&!first?.locked&&
+  (!first||e.at<first.at);
+}
 function registerFirstFollow(s,m,e){
- if(e.type!=='follow_build'||!e.work||e.actor.id===s.account)return;
- const first=s.firstFollow;if(first?.historical||first?.locked)return;
- if(first&&(first.at<e.at||(first.at===e.at&&first.eventId.localeCompare(e.id)<=0)))return;
- if(first){const previous=s.events.find(x=>x.id===first.eventId);if(previous)delete previous.specialPush;const old=findMessage(s,first.messageId);if(old){old.popup=false;old.popupPersistent=false;}}
+ if(!isFirstFollowCandidate(s,e))return;
+ const first=s.firstFollow;
+ if(first){const previous=s.events.find(x=>x.id===first.eventId);if(previous)delete previous.specialPush;const old=findMessage(s,first.messageId);if(old){old.popup=false;old.popupPersistent=false;delete old.popupKind;delete old.firstFollowEventId;}}
  s.firstFollow={messageId:m.id,eventId:e.id,at:e.at,locked:false};
  m.popup=true;m.popupPersistent=true;m.popupKind='first_follow';m.popupState='pending';m.firstFollowEventId=e.id;
  e.specialPush='first_follow';
@@ -132,9 +152,9 @@ export function receive(s,input){
   const original=input.reuploadOf&&s.events.find(e=>e.work?.id===input.reuploadOf&&e.actor.id===actor.id&&e.object.id===object.id);
   if(original&&at>=original.at&&at-original.at<DAY)return eventMessage(s,original);
  }
- const interaction=INTERACTIONS.includes(type),aggregate=interaction&&type!=='expert_comment';
- let m=aggregate?s.messages.findLast(m=>valid(s,m)&&unread(m)&&m.type===type&&m.object.id===object.id&&at>=m.createdAt&&at-m.createdAt<HOUR):null;
  const e={...input,id:input.id||`event-${++s.seq}`,type,at,object,actor,handled:false,viewed:false};
+ const interaction=INTERACTIONS.includes(type),aggregate=interaction&&type!=='expert_comment'&&!isFirstFollowCandidate(s,e);
+ let m=aggregate?s.messages.findLast(m=>valid(s,m)&&unread(m)&&m.popupKind!=='first_follow'&&m.type===type&&m.object.id===object.id&&at>=m.createdAt&&at-m.createdAt<HOUR):null;
  if(!m){
   m={id:`message-${++s.seq}`,order:s.seq,type,object,category:interaction?'feedback':'system',source:interaction?(object.kind==='model'||object.kind==='remix'?'造型库':'作品圈'):'Zometool官方',createdAt:at,latestAt:at,expiresAt:Math.min(at+90*DAY,input.expiresAt??Infinity),events:[],readIds:[],popup:PERSONAL.includes(type)||(input.popup===true&&!interaction&&type!=='review'),popupState:'pending',popupStart:input.popupStart??at,popupEnd:input.popupEnd??(input.expiresAt??at+90*DAY),popupPersistent:PERSONAL.includes(type),targetAvailable:true,title:interaction?undefined:input.title,text:interaction?undefined:input.text};
   s.messages.push(m);
@@ -172,19 +192,25 @@ export function readAll(s,category){list(s,category).forEach(m=>{m.readIds=[...m
 export function remove(s,id){const m=findMessage(s,id);if(!m)return;m.deleted=true;completeReminder(s,m);details(s,m).forEach(e=>e.handled=true);}
 export function removeRead(s,category){list(s,category).filter(m=>!unread(m)).forEach(m=>remove(s,m.id));}
 export function advance(s,ms){s.now+=ms;flushQueue(s);}
+// Leaving the home screen does not dismiss an unhandled reminder.
+export function suspendPopup(s,launch){
+ for(const m of s.messages)if(m.popupState==='shown'&&m.popupDevice===launch.device)m.popupState='pending';
+ launch.shown=null;
+}
 export function homePopup(s,launch){
  if(!s.loggedIn)return null;
  const active=findMessage(s,launch.shown);
  if(active?.popupState==='shown'&&popupValid(s,active))return null;
  launch.shown=null;
- const firstCheck=!launch.screened;launch.screened=true;
+ launch.screened=true;
  const candidates=s.messages.filter(m=>m.popup&&m.popupState==='pending'&&popupValid(s,m)&&s.now>=m.popupStart&&(m.popupPersistent||s.now<m.popupEnd));
  const special=candidates.filter(m=>m.popupPersistent);
- special.sort((a,b)=>Number(personal(b))-Number(personal(a))||b.latestAt-a.latestAt||b.order-a.order);
+ special.sort(compareNotifications);
  // One ordinary official opportunity per launch, after every special reminder.
  let m=special[0];
- if(!m&&!launch.officialChecked&&(firstCheck||launch.specialChain)){
-  launch.officialChecked=true;m=candidates.filter(m=>!m.popupPersistent).sort((a,b)=>b.latestAt-a.latestAt||b.order-a.order)[0];
+ if(!m&&!launch.officialChecked){
+  m=candidates.filter(m=>!m.popupPersistent).sort(compareNotifications)[0];
+  if(m)launch.officialChecked=true;
  }
  if(m){launch.shown=m.id;launch.specialChain=!!m.popupPersistent;m.popupState='shown';m.popupDevice=launch.device;if(m.popupKind==='first_follow')s.firstFollow.locked=true;}
  return m||null;

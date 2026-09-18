@@ -29,7 +29,9 @@
 }
 .center-feedback-row .avatar-card { flex: 0 0 38px; }
 .center-feedback-row .avatar-face { width: 38px; height: 38px; font-size: 19px; }
-.center-feedback-row .avatar-name { display: none; }
+.center-feedback-row .avatar-name { display: block; }
+.follow-user-group { display: flex; flex: 0 0 auto; align-items: center; gap: 10px; }
+.follow-user-works { display: flex; align-items: flex-start; gap: 10px; }
 .center-feedback-copy { flex: 1; min-width: 0; }
 .center-feedback-person { display: flex; flex-wrap: wrap; gap: 4px 10px; justify-content: space-between; font-size: 13px; }
 .center-feedback-person time { font-size: 10px; color: #89919c; white-space: nowrap; }
