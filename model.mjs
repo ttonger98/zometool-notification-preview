@@ -1,6 +1,7 @@
 // One deterministic domain model drives the center, simulated Push, and home reminders.
 export const MINUTE=60_000, HOUR=60*MINUTE, DAY=24*HOUR;
-export const VERSION='2026-09-18-priority-first-record';
+export const VERSION='2026-09-20-review-sync';
+export const GROWTH_STAR_TITLE_TEMPLATE='太棒了！你是【年份】【月份】的Zometool成长之星！';
 export const INTERACTIONS=['like','favorite','share','follow_build','praise','expert_comment','follow'];
 export const PERSONAL=['admission','honor','growth_star','selected'];
 export const TYPES={
@@ -18,14 +19,18 @@ export function createState(now=Date.parse('2026-09-10T10:00:00+08:00')){return 
 export const isInteraction=m=>INTERACTIONS.includes(m.type);
 export const valid=(s,m)=>!m.deleted&&!m.offline&&s.now<m.expiresAt;
 export const unread=m=>m.events.some(id=>!m.readIds.includes(id));
-export function list(s,category='all'){return s.messages.filter(m=>valid(s,m)&&(category==='all'||m.category===category)).sort((a,b)=>Number(unread(b))-Number(unread(a))||b.latestAt-a.latestAt||b.order-a.order);}
-export const stats=(s,c='all')=>{const items=list(s,c);return {total:items.length,unread:items.filter(unread).length,read:items.filter(m=>!unread(m)).length};};
+export function list(s,category='all'){return s.messages.filter(m=>valid(s,m)&&s.now>=(m.publishedAt??m.createdAt)&&(category==='all'||m.category===category)).sort((a,b)=>Number(unread(b))-Number(unread(a))||b.latestAt-a.latestAt||b.order-a.order);}
+export const stats=(s,c='all')=>{const items=list(s,c);return {total:items.length,unread:items.filter(m=>unread(m)&&m.targetAvailable).length,read:items.filter(m=>!unread(m)).length};};
 export const findMessage=(s,id)=>s.messages.find(m=>m.id===id);
 export const details=(s,m)=>m.events.map(id=>s.events.find(e=>e.id===id)).filter(Boolean);
 export const users=(s,m)=>[...new Map(details(s,m).map(e=>[e.actor.id,e.actor])).values()];
 export const objectLabel=m=>({model:'造型',work:'作品',remix:'跟拼作品',profile:'主页'}[m.object.kind]||'作品');
 export function title(s,m){
  if(m.popupKind==='first_follow')return '你的创意，第一次有人跟着拼啦！';
+ if(m.type==='growth_star'){
+  const [year,month]=localDate(m.createdAt).split('-');
+  return GROWTH_STAR_TITLE_TEMPLATE.replace('【年份】',`${year}年`).replace('【月份】',`${Number(month)}月`);
+ }
  const n=users(s,m).length,obj=objectLabel(m),person=n===1?'有人':`有${n}个人`;
  if(m.type==='like')return `${person}赞了你的${obj}`;
  if(m.type==='favorite')return `${person}收藏了你的${obj}`;
@@ -34,7 +39,7 @@ export function title(s,m){
  if(m.type==='praise')return `${person}夸了夸你的${obj}`;
  if(m.type==='expert_comment')return `共创达人评论了你的${obj}`;
  if(m.type==='follow')return `${person}关注了你！`;
- return m.title||({admission:'恭喜！你的造型入选官方造型库啦！',honor:'恭喜你成为共创达人！',growth_star:'你是本月的成长之星！',selected:'你的作品入选主题合集啦！',review:'作品需要调整一下',activity:'新一期活动招募开始啦！',collection:'新一期优秀作品集上线啦！',model_batch:'造型库上新造型啦！',course:'新课程上线啦！',feature:'造型库功能更新啦！',marketing:'创意拼搭活动开始啦！'}[m.type]);
+ return m.title||({admission:'恭喜！你的造型入选官方造型库啦！',honor:'恭喜你成为共创达人！',selected:'你的作品入选主题合集啦！',review:'作品需要调整一下',activity:'新一期活动招募开始啦！',collection:'新一期优秀作品集上线啦！',model_batch:'造型库上新造型啦！',course:'新课程上线啦！',feature:'造型库功能更新啦！',marketing:'创意拼搭活动开始啦！'}[m.type]);
 }
 export function body(s,m){
  if(m.popupKind==='first_follow'){const e=details(s,m)[0];return `${e.actor.name}跟着你的「${m.object.name}」拼出了新作品。`;}
@@ -61,10 +66,12 @@ export function target(m,context='main'){
 // Ordinary notifications share one account-wide allowance. Personal results bypass it.
 export function round(s){const r=s.ordinaryRound;return r&&s.now<r.start+2*HOUR?{...r,remaining:2-r.used,ends:r.start+2*HOUR}:{used:0,remaining:2,start:null,ends:null};}
 export const personal=m=>PERSONAL.includes(m.type);
+export const official=m=>!personal(m)&&!isInteraction(m)&&m.type!=='review';
+export const deliveryActive=(s,m)=>!official(m)||(s.now>=(m.publishedAt??m.createdAt)&&s.now<(m.deliveryExpiresAt??Infinity));
 export const personalPush=e=>personal(e)||e.specialPush==='first_follow';
 const pushGate=s=>s.loggedIn&&s.notifications&&s.mode==='background'&&sendingHours(s.now);
 const firstFollow=e=>e.specialPush==='first_follow'||e.popupKind==='first_follow';
-const priority=e=>personal(e)?0:firstFollow(e)?1:!isInteraction(e)&&e.type!=='review'?2:e.type==='expert_comment'?3:e.type==='review'?5:4;
+const priority=e=>official(e)?0:personal(e)?1:firstFollow(e)?2:e.type==='expert_comment'?3:e.type==='review'?5:4;
 const typePriority=e=>{
  if(personal(e))return {honor:0,growth_star:0,selected:1,admission:2}[e.type];
  if(firstFollow(e))return 0;
@@ -74,9 +81,9 @@ const typePriority=e=>{
 };
 // The same channel ordering applies before time is used as a tie-breaker.
 export const compareNotifications=(a,b)=>priority(a)-priority(b)||typePriority(a)-typePriority(b)||(b.at??b.latestAt)-(a.at??a.latestAt)||(b.order??0)-(a.order??0)||String(b.id).localeCompare(String(a.id));
-function pushEligible(s,e){return pushGate(s)&&(personalPush(e)||(round(s).remaining>0&&(s.lastPush===null||s.now-s.lastPush>=MINUTE)));}
+function pushEligible(s,e){const m=eventMessage(s,e);return pushGate(s)&&m&&deliveryActive(s,m)&&(personalPush(e)||(round(s).remaining>0&&(s.lastPush===null||s.now-s.lastPush>=MINUTE)));}
 function eventMessage(s,e){return s.messages.find(m=>m.id===e.messageId);}
-function pending(s,e){const m=eventMessage(s,e);return !e.handled&&!e.viewed&&m&&valid(s,m)&&m.targetAvailable;}
+function pending(s,e){const m=eventMessage(s,e);return !e.handled&&!e.viewed&&m&&valid(s,m)&&m.targetAvailable&&(!official(m)||s.now<(m.deliveryExpiresAt??Infinity));}
 function recordPush(s,m,events){
  events=[...events].sort((a,b)=>a.at-b.at||a.id.localeCompare(b.id));
  const latest=events.at(-1),n=new Set(events.map(e=>e.actor.id)).size;
@@ -100,7 +107,7 @@ export function flushQueue(s,incoming=null){
  let sent=null;
  if(quiet.length){
   const candidates=quiet.filter(e=>pending(s,e)).sort(compareNotifications);
-  const e=candidates[0];if(e&&!pushEligible(s,e))return null;
+  const e=candidates.find(e=>pushEligible(s,e));if(!e&&candidates.length)return null;
   if(e)sent=recordPush(s,eventMessage(s,e),[e]);
   quiet.forEach(e=>{e.quietReleased=true;e.handled=true;});
   s.queue=s.queue.filter(id=>!quiet.some(e=>e.id===id));
@@ -115,9 +122,9 @@ export function flushQueue(s,incoming=null){
  candidates.sort(compareNotifications);
  for(const e of candidates){
   const m=eventMessage(s,e);if(!pending(s,e)||!pushEligible(s,e))continue;
-  const events=isInteraction(m)&&!personalPush(e)?s.events.filter(x=>x.type===e.type&&x.object.id===e.object.id&&!personalPush(x)&&pending(s,x)&&(!x.quietUntil||x.quietReleased)):[e];
+  const events=isInteraction(m)&&!personalPush(e)?s.events.filter(x=>x.messageId===m.id&&!personalPush(x)&&pending(s,x)&&(!x.quietUntil||x.quietReleased)):[e];
   sent=recordPush(s,m,events);s.queue=s.queue.filter(id=>!events.some(x=>x.id===id));
-  if(!personalPush(e))break;
+  // The interval gate blocks another ordinary Push, but not exempt personal results.
  }
  return sent;
 }
@@ -135,28 +142,23 @@ function registerFirstFollow(s,m,e){
  m.popup=true;m.popupPersistent=true;m.popupKind='first_follow';m.popupState='pending';m.firstFollowEventId=e.id;
  e.specialPush='first_follow';
 }
-export function popupValid(s,m){return !m.deleted&&!m.offline&&m.targetAvailable&&(m.popupPersistent||valid(s,m));}
+export function targetValid(s,m){return !m.deleted&&!m.offline&&m.targetAvailable&&(m.popupPersistent||valid(s,m));}
+export function popupValid(s,m){return targetValid(s,m)&&deliveryActive(s,m)&&(m.popupPersistent||(s.now>=m.popupStart&&s.now<m.popupEnd));}
 export function receive(s,input){
  const type=input.type;if(!TYPES[type])throw Error('Unknown message type');
  if(!allowedKinds(type).includes((input.object||OBJECTS.wheel).kind))return null;
  if(input.recipient&&input.recipient!==s.account)return null;
- if(input.approved===false||input.formal===false||input.valid===false)return null;
+ if((type==='review'?input.approved===true:input.approved===false)||input.formal===false||input.valid===false)return null;
  if(input.id&&s.events.some(e=>e.id===input.id))return eventMessage(s,s.events.find(e=>e.id===input.id));
  const object={...(input.object||OBJECTS.wheel)},at=input.at??s.now,actor=input.actor||{id:'official',name:'Zometool官方',color:'#4ea5df'};
  const prior=s.events.find(e=>e.type===type&&e.object.id===object.id&&e.actor.id===actor.id);
- if(prior&&['like','favorite','follow'].includes(type))return eventMessage(s,prior);
- if(type==='follow_build'){
-  const repeat=s.events.find(e=>e.type===type&&e.actor.id===actor.id&&e.object.id===object.id&&e.work?.id===input.work?.id);
-  if(repeat)return eventMessage(s,repeat);
-  // The demo can identify a deleted/reuploaded work without hiding genuinely new works.
-  const original=input.reuploadOf&&s.events.find(e=>e.work?.id===input.reuploadOf&&e.actor.id===actor.id&&e.object.id===object.id);
-  if(original&&at>=original.at&&at-original.at<DAY)return eventMessage(s,original);
- }
+ if(prior&&['like','favorite','follow','follow_build'].includes(type))return eventMessage(s,prior);
  const e={...input,id:input.id||`event-${++s.seq}`,type,at,object,actor,handled:false,viewed:false};
  const interaction=INTERACTIONS.includes(type),aggregate=interaction&&type!=='expert_comment'&&!isFirstFollowCandidate(s,e);
  let m=aggregate?s.messages.findLast(m=>valid(s,m)&&unread(m)&&m.popupKind!=='first_follow'&&m.type===type&&m.object.id===object.id&&at>=m.createdAt&&at-m.createdAt<HOUR):null;
  if(!m){
-  m={id:`message-${++s.seq}`,order:s.seq,type,object,category:interaction?'feedback':'system',source:interaction?(object.kind==='model'||object.kind==='remix'?'造型库':'作品圈'):'Zometool官方',createdAt:at,latestAt:at,expiresAt:Math.min(at+90*DAY,input.expiresAt??Infinity),events:[],readIds:[],popup:PERSONAL.includes(type)||(input.popup===true&&!interaction&&type!=='review'),popupState:'pending',popupStart:input.popupStart??at,popupEnd:input.popupEnd??(input.expiresAt??at+90*DAY),popupPersistent:PERSONAL.includes(type),targetAvailable:true,title:interaction?undefined:input.title,text:interaction?undefined:input.text};
+  const publishedAt=input.publishedAt??at,deliveryExpiresAt=input.deliveryExpiresAt??input.expiresAt??at+90*DAY;
+  m={id:`message-${++s.seq}`,order:s.seq,type,object,category:interaction?'feedback':'system',source:interaction?(object.kind==='model'||object.kind==='remix'?'造型库':'作品圈'):'Zometool官方',createdAt:at,latestAt:at,expiresAt:at+90*DAY,publishedAt,deliveryExpiresAt,events:[],readIds:[],popup:PERSONAL.includes(type)||(input.popup===true&&!interaction&&type!=='review'),popupState:'pending',popupStart:Math.max(publishedAt,input.popupStart??at),popupEnd:Math.min(deliveryExpiresAt,input.popupEnd??deliveryExpiresAt),popupPersistent:PERSONAL.includes(type),targetAvailable:true,title:interaction?undefined:input.title,text:interaction?undefined:input.text};
   s.messages.push(m);
  }
  e.messageId=m.id;m.events.push(e.id);m.latestAt=Math.max(m.latestAt,at);s.events.push(e);
@@ -188,7 +190,7 @@ export function pushDestination(s,p){
  return {kind:'target',messageId:m?.id,actor:m?.type==='follow'?events.at(-1)?.actor:null,commentId:m?.type==='praise'?p.latestEventId:null};
 }
 function completeReminder(s,m){m.popupState='completed';if(m.popupKind==='first_follow'&&s.firstFollow)s.firstFollow.locked=true;}
-export function readAll(s,category){list(s,category).forEach(m=>{m.readIds=[...m.events];if(!m.popupPersistent)completeReminder(s,m);});}
+export function readAll(s,category){list(s,category).forEach(m=>{m.readIds=[...m.events];completeReminder(s,m);});}
 export function remove(s,id){const m=findMessage(s,id);if(!m)return;m.deleted=true;completeReminder(s,m);details(s,m).forEach(e=>e.handled=true);}
 export function removeRead(s,category){list(s,category).filter(m=>!unread(m)).forEach(m=>remove(s,m.id));}
 export function advance(s,ms){s.now+=ms;flushQueue(s);}
@@ -204,14 +206,9 @@ export function homePopup(s,launch){
  launch.shown=null;
  launch.screened=true;
  const candidates=s.messages.filter(m=>m.popup&&m.popupState==='pending'&&popupValid(s,m)&&s.now>=m.popupStart&&(m.popupPersistent||s.now<m.popupEnd));
- const special=candidates.filter(m=>m.popupPersistent);
- special.sort(compareNotifications);
- // One ordinary official opportunity per launch, after every special reminder.
- let m=special[0];
- if(!m&&!launch.officialChecked){
-  m=candidates.filter(m=>!m.popupPersistent).sort(compareNotifications)[0];
-  if(m)launch.officialChecked=true;
- }
+ // One official popup per launch comes first; then continue all personal reminders.
+ const m=candidates.filter(m=>m.popupPersistent||!launch.officialChecked).sort(compareNotifications)[0];
+ if(m&&!m.popupPersistent)launch.officialChecked=true;
  if(m){launch.shown=m.id;launch.specialChain=!!m.popupPersistent;m.popupState='shown';m.popupDevice=launch.device;if(m.popupKind==='first_follow')s.firstFollow.locked=true;}
  return m||null;
 }

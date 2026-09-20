@@ -5,7 +5,7 @@ import {renderCenter} from '../center-view.mjs';
 
 const objectFor=t=>['honor','growth_star','follow'].includes(t)?M.OBJECTS.self:['admission','follow_build','model_batch'].includes(t)?M.OBJECTS.bridge:M.OBJECTS.wheel;
 const add=(s,type,extra={})=>M.receive(s,{type,object:objectFor(type),actor:{id:'user-'+s.seq,name:'小宇'},...extra});
-const follow=(s,id,extra={})=>add(s,'follow_build',{id,actor:{id:'builder',name:'小宇'},work:{id:'work-'+id,name:'小宇的作品',icon:'🌁'},...extra});
+const follow=(s,id,extra={})=>add(s,'follow_build',{id,actor:{id:'builder-'+id,name:'小宇'},work:{id:'work-'+id,name:'小宇的作品',icon:'🌁'},...extra});
 
 test('first follow stays independent before and after read, including concurrent same-model feedback',()=>{
  const s=M.createState(),first=follow(s,'first',{silent:true}),ordinary=follow(s,'second',{silent:true});
@@ -103,13 +103,13 @@ test('suspending one device does not release a popup displayed by another device
  assert.equal(m.popupState,'shown');
  assert.equal(M.homePopup(s,{device:'B'}),null);
 });
-test('first-follow center uses exclusive copy and ordinary follow works group avatar and nickname once',()=>{
+test('first-follow center uses exclusive copy and each ordinary follower has one avatar, nickname and work',()=>{
  const s=M.createState(),first=follow(s,'first',{silent:true}),ordinary=follow(s,'next',{silent:true});follow(s,'another',{silent:true});
  const render=m=>renderCenter({state:s,category:'feedback',items:M.list(s),selected:m.id}).match(/<article[\s\S]*?<\/article>/)[0];
  assert.match(render(first),/第一次有人跟着拼啦/);
  assert.match(render(first),/>看看跟拼作品<\/button>/);
  const html=render(ordinary);
- assert.equal((html.match(/class="avatar-card"/g)||[]).length,1);
+ assert.equal((html.match(/class="avatar-card"/g)||[]).length,2);
  assert.equal((html.match(/class="work-img"/g)||[]).length,2);
  assert.match(html,/class="avatar-face"[\s\S]*class="avatar-name">小宇/);
 });
