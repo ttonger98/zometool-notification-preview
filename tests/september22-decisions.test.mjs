@@ -100,16 +100,16 @@ test('审核重新提交后保留原因但不可重复提交，再次不通过�
  assert.equal(s.pushes[0].messageId,again.id);
 });
 
-test('消息中心展示已读统计，入选消息合集名称可点击',()=>{
+test('消息中心不再展示已读统计，入选消息合集名称可点击',()=>{
  const s=M.createState();
  const m=M.receive(s,{type:'selected',object:M.OBJECTS.wheel,silent:true,actor:{id:'a',name:'小宇'}});
  M.view(s,m.id);
  const html=renderCenter({state:s,category:'all',items:M.list(s),selected:m.id});
- assert.match(html,/class="list-stats">已读 1／共 1</);
  assert.match(html,/inline-honor-link" data-action="target">创意游乐园</);
+ assert.doesNotMatch(html,/list-stats/);
  M.invalidateTarget(s,m.id);
  const kept=renderCenter({state:s,category:'all',items:M.list(s),selected:m.id});
- assert.match(kept,/class="list-stats">已读 1／共 1</);
+ assert.doesNotMatch(kept,/list-stats/);
  const empty=renderCenter({state:M.createState(),category:'all',items:[],selected:null});
  assert.doesNotMatch(empty,/list-stats/);
 });

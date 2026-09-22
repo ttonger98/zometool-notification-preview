@@ -38,15 +38,7 @@
 .center-feedback-copy p { margin: 4px 0 0; font-size: 14px; line-height: 1.5; }
 [role="button"][data-action] { cursor: pointer; }
 [role="button"][data-action]:focus-visible { outline: 3px solid #166cb5; outline-offset: 2px; }
-.list-stats {
-  height: 18px;
-  line-height: 18px;
-  text-align: center;
-  color: #17456e;
-  font-size: 13px;
-  font-weight: 900;
-}
-.mail-list-panel .mail-list { height: calc(100% - 18px); }
+.mail-list-panel .mail-list { height: 100%; }
 .mail-body .inline-honor-link { color: #166cb5; }
 @media (orientation: landscape) and (max-height: 520px) {
   .center-feedback { margin-top: 6px; }
