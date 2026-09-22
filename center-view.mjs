@@ -1,5 +1,5 @@
-import {honorBanner} from './honor-visual.mjs?v=20260922-boundaries';
-import * as M from './model.mjs?v=20260922-boundaries';
+import {honorBanner} from './honor-visual.mjs?v=20260923-boundaries';
+import * as M from './model.mjs?v=20260923-boundaries';
 
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const interactive='role="button" tabindex="0"';

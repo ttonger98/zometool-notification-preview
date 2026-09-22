@@ -1,13 +1,13 @@
 // One deterministic domain model drives the center, simulated Push, and home reminders.
 export const MINUTE=60_000, HOUR=60*MINUTE, DAY=24*HOUR;
-export const VERSION='2026-09-22-review';
+export const VERSION='2026-09-23-review';
 export const GROWTH_STAR_TITLE_TEMPLATE='太棒了！你是【年份】【月份】的Zometool成长之星！';
 export const COLLECTION_NAME='创意游乐园';
 export const INTERACTIONS=['like','favorite','share','follow_build','praise','expert_comment','follow'];
 export const PERSONAL=['admission','honor','growth_star','selected'];
 export const TYPES={
  like:['点赞','👍'],favorite:['收藏','⭐'],share:['分享','🔁'],follow_build:['跟拼','🧱'],praise:['夸一夸','🏆'],expert_comment:['共创达人评论','💬'],follow:['新增粉丝','👥'],
- admission:['造型正式入库','🎁'],honor:['共创达人','🏅'],growth_star:['成长之星','🌟'],selected:['作品入选','✨'],review:['作品审核结果','📝'],activity:['活动招募','🎯'],collection:['作品集上线','🖼️'],model_batch:['造型库上新','🆕'],course:['课程上新','📚'],feature:['功能更新','🔧'],marketing:['官方活动','🎈']
+ admission:['造型正式入库','🎁'],honor:['共创达人','🏅'],growth_star:['成长之星','🌟'],selected:['作品入选','✨'],review:['审核结果','📝'],activity:['活动招募','🎯'],collection:['作品集上线','🖼️'],model_batch:['造型库上新','🆕'],course:['课程上新','📚'],feature:['功能更新','🔧'],marketing:['官方活动','🎈']
 };
 export const allowedKinds=type=>({like:['work','remix'],favorite:['model','work','remix'],share:['model','work','remix'],follow_build:['model'],admission:['model'],praise:['work','remix'],expert_comment:['work','remix'],follow:['profile'],honor:['profile'],growth_star:['profile'],selected:['work','remix'],review:['work','remix']}[type]||['model','work','remix']);
 export const OBJECTS={
@@ -21,7 +21,9 @@ export const isInteraction=m=>INTERACTIONS.includes(m.type);
 export const valid=(s,m)=>!m.deleted&&!m.offline&&s.now<m.expiresAt;
 export const unread=m=>m.events.some(id=>!m.readIds.includes(id));
 export function list(s,category='all'){return s.messages.filter(m=>valid(s,m)&&s.now>=(m.publishedAt??m.createdAt)&&(category==='all'||m.category===category)).sort((a,b)=>Number(unread(b))-Number(unread(a))||b.latestAt-a.latestAt||b.order-a.order);}
-export const stats=(s,c='all')=>{const items=list(s,c);return {total:items.length,unread:items.filter(m=>unread(m)&&m.targetAvailable).length,read:items.filter(m=>!unread(m)).length};};
+// 未读角标与列表统计同口径：只要未读就计入，目标失效的历史消息同样计入，直到已读或删除。
+export const stats=(s,c='all')=>{const items=list(s,c);return {total:items.length,unread:items.filter(m=>unread(m)).length,read:items.filter(m=>!unread(m)).length};};
+export const reviewLabel=m=>m.object?.kind==='remix'?'跟拼作品':'作品';
 export const findMessage=(s,id)=>s.messages.find(m=>m.id===id);
 export const details=(s,m)=>m.events.map(id=>s.events.find(e=>e.id===id)).filter(Boolean);
 export const users=(s,m)=>[...new Map(details(s,m).map(e=>[e.actor.id,e.actor])).values()];
@@ -40,7 +42,7 @@ export function title(s,m){
  if(m.type==='praise')return `${person}夸了夸你的${obj}`;
  if(m.type==='expert_comment')return `共创达人评论了你的${obj}`;
  if(m.type==='follow')return `${person}关注了你！`;
- return m.title||({admission:'恭喜！你的造型入选官方造型库啦！',honor:'恭喜你成为共创达人！',selected:'你的作品入选主题合集啦！',review:'作品需要调整一下',activity:'新一期活动招募开始啦！',collection:'新一期优秀作品集上线啦！',model_batch:'造型库上新造型啦！',course:'新课程上线啦！',feature:'造型库功能更新啦！',marketing:'创意拼搭活动开始啦！'}[m.type]);
+ return m.title||({admission:'恭喜！你的造型入选官方造型库啦！',honor:'恭喜你成为共创达人！',selected:'你的作品入选主题合集啦！',review:`${reviewLabel(m)}需要调整一下`,activity:'新一期活动招募开始啦！',collection:'新一期优秀作品集上线啦！',model_batch:'造型库上新造型啦！',course:'新课程上线啦！',feature:'造型库功能更新啦！',marketing:'创意拼搭活动开始啦！'}[m.type]);
 }
 export function body(s,m){
  if(m.popupKind==='first_follow'){const e=details(s,m)[0];return `${e.actor.name}跟着你的「${m.object.name}」拼出了新作品。`;}
@@ -51,11 +53,12 @@ export function body(s,m){
   if(m.type==='expert_comment')return `共创达人${who}评论了你的${objectLabel(m)}「${m.object.name}」：`;
   return `${who}${{like:'点赞了',favorite:'收藏了',share:'分享了',follow_build:'跟拼了',praise:'夸了夸'}[m.type]}你的${objectLabel(m)}「${m.object.name}」。`;
  }
- return {admission:`你的「${m.object.name}」入选官方造型库。更多小伙伴可以跟着你的创意一起拼搭啦！`,honor:'感谢你分享精彩创意！共创达人身份标识已点亮，去个人主页看看吧。',growth_star:'每一次动手，都藏着新的发现。你的拼搭故事入选成长之星，快来看看属于你的展示页！',selected:`你的作品「${m.object.name}」入选「${COLLECTION_NAME}」主题合集，快来看看你的精彩创作吧！`,review:`你的作品「${m.object.name}」需要调整。请上传主体清晰的作品封面，修改后可以重新提交审核。`,activity:'来参加创意拼搭活动吧！查看本期活动主题、参与方式和活动时间。',collection:'一起来看看小伙伴们的精彩创作，寻找你的下一份拼搭灵感吧！',model_batch:'本批上新3个造型：水晶城堡、三角桥、天空塔。一起来寻找新的拼搭灵感！',course:'学习新的拼搭技巧，探索稳定结构的奥秘。',feature:'造型库新增主题筛选，帮助你更快找到想拼的造型。',marketing:'本期创意活动已开启，查看活动内容和参与方式。'}[m.type];
+ const label=reviewLabel(m);
+ return {admission:`你的「${m.object.name}」入选官方造型库。更多小伙伴可以跟着你的创意一起拼搭啦！`,honor:'感谢你分享精彩创意！共创达人身份标识已点亮，去个人主页看看吧。',growth_star:'每一次动手，都藏着新的发现。你的拼搭故事入选成长之星，快来看看属于你的展示页！',selected:`你的作品「${m.object.name}」入选「${COLLECTION_NAME}」主题合集，快来看看你的精彩创作吧！`,review:`你的${label}「${m.object.name}」需要调整。请上传主体清晰的${label}封面，修改后可以重新提交审核。`,activity:'来参加创意拼搭活动吧！查看本期活动主题、参与方式和活动时间。',collection:'一起来看看小伙伴们的精彩创作，寻找你的下一份拼搭灵感吧！',model_batch:'本批上新3个造型：水晶城堡、三角桥、天空塔。一起来寻找新的拼搭灵感！',course:'学习新的拼搭技巧，探索稳定结构的奥秘。',feature:'造型库新增主题筛选，帮助你更快找到想拼的造型。',marketing:'本期创意活动已开启，查看活动内容和参与方式。'}[m.type];
 }
 export function target(m,context='main'){
  if(context==='image')return `${objectLabel(m)}详情`;
- if(m.type==='review')return '作品修改';
+ if(m.type==='review')return `${reviewLabel(m)}修改`;
  if(m.type==='admission')return ['main','popup'].includes(context)?'个人主页 · 入库造型':'造型详情';
  if(m.type==='honor')return '个人主页 · 共创达人';
  if(m.type==='growth_star')return `成长之星 · ${(m.awardPeriod||localDate(m.createdAt)).slice(0,7)}`;
@@ -210,23 +213,27 @@ export function readAll(s,category){list(s,category).forEach(m=>{m.readIds=[...m
 export function remove(s,id){const m=findMessage(s,id);if(!m)return;m.deleted=true;stopReminder(s,m);}
 export function removeRead(s,category){list(s,category).filter(m=>!unread(m)).forEach(m=>remove(s,m.id));}
 export function advance(s,ms){s.now+=ms;flushQueue(s);}
-// Leaving the home screen does not dismiss an unhandled reminder.
+// 个人成果弹窗在展示时即结束提醒，离开首页不再恢复；官方通知未处理时保留，下次进入首页继续检查。
 export function suspendPopup(s,launch){
- for(const m of s.messages)if(m.popupState==='shown'&&m.popupDevice===launch.device)m.popupState='pending';
+ for(const m of s.messages)if(m.popupState==='shown'&&m.popupDevice===launch.device)m.popupState=m.popupPersistent?'completed':'pending';
  launch.shown=null;
 }
 export function homePopup(s,launch){
  reconcileReminders(s);
  if(!s.loggedIn||s.devices?.[launch.device]?.loggedIn===false||s.devices?.[launch.device]?.mode==='background')return null;
  const active=findMessage(s,launch.shown);
- if(active?.popupState==='shown'&&popupValid(s,active))return null;
+ if(active?.popupState==='shown')return null;
  launch.shown=null;
  launch.screened=true;
  const candidates=s.messages.filter(m=>m.popup&&m.popupState==='pending'&&popupValid(s,m)&&s.now>=m.popupStart&&(m.popupPersistent||s.now<m.popupEnd));
  // One official popup per launch comes first; then continue all personal reminders.
  const m=candidates.filter(m=>m.popupPersistent?(launch.personalCloses||0)<2:!launch.officialChecked).sort(compareNotifications)[0];
  if(m&&!m.popupPersistent)launch.officialChecked=true;
- if(m){launch.shown=m.id;launch.specialChain=!!m.popupPersistent;m.popupState='shown';m.popupDevice=launch.device;if(m.popupKind==='first_follow')s.firstFollow.locked=true;}
+ if(m){
+  launch.shown=m.id;launch.specialChain=!!m.popupPersistent;m.popupState='shown';m.popupDevice=launch.device;if(m.popupKind==='first_follow')s.firstFollow.locked=true;
+  // 个人成果展示即结束该条提醒：停止尚未发送的Push，其他设备与本次启动之后都不再展示。
+  if(m.popupPersistent){stopReminder(s,m);m.popupState='shown';m.popupDevice=launch.device;}
+ }
  return m||null;
 }
 export function closePopup(s,id,launch){const m=findMessage(s,id);if(!m||m.popupState==='completed')return;if(launch&&m.popupPersistent)launch.personalCloses=(launch.personalCloses||0)+1;stopReminder(s,m);}

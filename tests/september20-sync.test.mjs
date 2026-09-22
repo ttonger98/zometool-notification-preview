@@ -54,11 +54,13 @@ test('official validity stops delivery but preserves the original message, badge
  assert.equal(M.view(s,m.id),true);assert.equal(M.unread(m),false);
  M.advance(s,90*M.DAY-M.HOUR);assert.equal(M.list(s).length,0);
 });
-test('deleted target excludes badge but preserves read state and history',()=>{
+test('deleted target keeps the badge and preserves read state and history',()=>{
  const s=M.createState(),m=add(s,'like');m.targetAvailable=false;
  assert.equal(M.unread(m),true);
- assert.deepEqual(M.stats(s),{total:1,unread:0,read:0});
+ assert.deepEqual(M.stats(s),{total:1,unread:1,read:0});
  assert.equal(M.targetValid(s,m),false);
+ M.view(s,m.id);
+ assert.deepEqual(M.stats(s),{total:1,unread:0,read:1});
 });
 test('official is first in a shared pending batch, with personal sends still exempt',()=>{
  const s=M.createState();add(s,'honor');add(s,'activity',{popup:true});follow(s,'a');add(s,'review');

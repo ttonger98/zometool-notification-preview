@@ -75,8 +75,17 @@ test('two consecutive personal closes pause; foreground return does not reset; i
  M.suspendPopup(s,launch);assert.equal(M.homePopup(s,launch),null);assert.equal(s.messages.filter(m=>m.popupPersistent&&m.popupState==='pending').length,2);
  M.enterHome(launch);assert.equal(M.homePopup(s,launch).type,'selected');
 });
-test('same result is exclusive while shown; leaving releases it; handled state survives devices and cleanup',()=>{
- const s=M.createState(),m=add(s,'honor'),a={device:'A'},b={device:'B'};assert.equal(M.homePopup(s,a).id,m.id);assert.equal(M.homePopup(s,b),null);M.suspendPopup(s,a);assert.equal(M.homePopup(s,b).id,m.id);M.closePopup(s,m.id,b);M.advance(s,100*M.DAY);assert.equal(M.homePopup(JSON.parse(JSON.stringify(s)),{device:'C'}),null);
+test('a personal result ends its reminder once shown; other devices, relaunch and cleanup never revive it',()=>{
+ const s=M.createState(),m=add(s,'honor'),a={device:'A'},b={device:'B'};
+ assert.equal(M.homePopup(s,a).id,m.id);
+ assert.equal(m.popupState,'shown');
+ assert.equal(M.homePopup(s,b),null);
+ M.suspendPopup(s,a);
+ assert.equal(M.homePopup(s,b),null);
+ assert.equal(M.homePopup(s,a),null);
+ assert.equal(M.unread(m),true);
+ M.advance(s,100*M.DAY);
+ assert.equal(M.homePopup(JSON.parse(JSON.stringify(s)),{device:'C'}),null);
 });
 test('direct visits do not read; failed notification navigation preserves state; unavailable explanation reads',()=>{
  const s=M.createState(),m=add(s,'honor');M.openNotification(s,m.id,{source:'direct'});assert.equal(M.unread(m),true);M.openNotification(s,m.id,{success:false});assert.equal(M.unread(m),true);assert.equal(m.popupState,'pending');M.invalidateTarget(s,m.id);assert.equal(M.openNotification(s,m.id).status,'unavailable');assert.equal(M.unread(m),false);

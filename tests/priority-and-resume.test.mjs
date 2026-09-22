@@ -79,17 +79,16 @@ test('new interaction sends only its own message and leaves older higher-priorit
  assert.equal(s.pushes.at(-1).type,'share');
  assert.ok(M.details(s,praise).every(e=>!e.handled));
 });
-test('unhandled popup is retained and re-ranked with new results on re-entry',()=>{
+test('a displayed personal result ends its reminder while a newer result still shows',()=>{
  const s=M.createState(),launch={device:'A'},admission=add(s,'admission');
  assert.equal(M.homePopup(s,launch).id,admission.id);
  M.suspendPopup(s,launch);
  const honor=add(s,'honor');
  assert.equal(M.homePopup(s,launch).id,honor.id);
  M.view(s,honor.id);
- assert.equal(M.homePopup(s,launch).id,admission.id);
- M.closePopup(s,admission.id);
- M.suspendPopup(s,launch);
- assert.equal(M.homePopup(s,{device:'A'}),null);
+ assert.equal(M.homePopup(s,launch),null);
+ assert.equal(admission.popupState,'completed');
+ assert.equal(M.unread(admission),true);
 });
 test('official display is consumed only when shown; background does not reset launch count',()=>{
  const s=M.createState(),launch={device:'A'};assert.equal(M.homePopup(s,launch),null);
