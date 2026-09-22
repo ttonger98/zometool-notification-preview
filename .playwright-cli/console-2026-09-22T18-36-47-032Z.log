@@ -1,0 +1,33 @@
+[   38064ms] TypeError: Cannot read properties of undefined (reading 'kind')
+    at HTMLDocument.<anonymous> (http://127.0.0.1:8953/app.mjs?v=20260923-review2:123:272)
+    at set (eval at <anonymous> (eval at evaluate (:367:30)), <anonymous>:1:292)
+    at eval (eval at <anonymous> (eval at evaluate (:367:30)), <anonymous>:1:408)
+    at async eval (eval at evaluate (:367:30), <anonymous>:4:30)
+    at async <anonymous>:393:30
+[   38187ms] [ERROR] TypeError: Cannot read properties of undefined (reading 'kind')
+    at http://127.0.0.1:8953/app.mjs?v=20260923-review2:98:258
+    at work (http://127.0.0.1:8953/app.mjs?v=20260923-review2:20:67) @ http://127.0.0.1:8953/app.mjs?v=20260923-review2:121
+[   38490ms] TypeError: Cannot read properties of undefined (reading 'kind')
+    at HTMLDocument.<anonymous> (http://127.0.0.1:8953/app.mjs?v=20260923-review2:123:272)
+    at set (eval at <anonymous> (eval at evaluate (:367:30)), <anonymous>:1:292)
+    at eval (eval at <anonymous> (eval at evaluate (:367:30)), <anonymous>:1:408)
+    at async eval (eval at evaluate (:367:30), <anonymous>:4:30)
+    at async <anonymous>:393:30
+[   38613ms] [ERROR] TypeError: Cannot read properties of undefined (reading 'kind')
+    at http://127.0.0.1:8953/app.mjs?v=20260923-review2:98:258
+    at work (http://127.0.0.1:8953/app.mjs?v=20260923-review2:20:67) @ http://127.0.0.1:8953/app.mjs?v=20260923-review2:121
+[   38916ms] TypeError: Cannot read properties of undefined (reading 'kind')
+    at HTMLDocument.<anonymous> (http://127.0.0.1:8953/app.mjs?v=20260923-review2:123:272)
+    at set (eval at <anonymous> (eval at evaluate (:367:30)), <anonymous>:1:292)
+    at eval (eval at <anonymous> (eval at evaluate (:367:30)), <anonymous>:1:408)
+    at async eval (eval at evaluate (:367:30), <anonymous>:4:30)
+    at async <anonymous>:393:30
+[   39040ms] [ERROR] TypeError: Cannot read properties of undefined (reading 'kind')
+    at http://127.0.0.1:8953/app.mjs?v=20260923-review2:98:258
+    at work (http://127.0.0.1:8953/app.mjs?v=20260923-review2:20:67) @ http://127.0.0.1:8953/app.mjs?v=20260923-review2:121
+[   73742ms] TypeError: Cannot read properties of undefined (reading 'kind')
+    at HTMLDocument.<anonymous> (http://127.0.0.1:8953/app.mjs?v=20260923-review2:123:272)
+    at sel (eval at <anonymous> (eval at evaluate (:367:30)), <anonymous>:1:292)
+    at eval (eval at <anonymous> (eval at evaluate (:367:30)), <anonymous>:1:464)
+    at async eval (eval at evaluate (:367:30), <anonymous>:4:30)
+    at async <anonymous>:393:30

@@ -103,13 +103,14 @@ test('suspending one device does not release a popup displayed by another device
  assert.equal(m.popupState,'shown');
  assert.equal(M.homePopup(s,{device:'B'}),null);
 });
-test('first-follow center uses exclusive copy and each ordinary follower has one avatar, nickname and work',()=>{
+test('first-follow center uses exclusive copy and each ordinary follower has one work without an avatar',()=>{
  const s=M.createState(),first=follow(s,'first',{silent:true}),ordinary=follow(s,'next',{silent:true});follow(s,'another',{silent:true});
  const render=m=>renderCenter({state:s,category:'feedback',items:M.list(s),selected:m.id}).match(/<article[\s\S]*?<\/article>/)[0];
  assert.match(render(first),/第一次有人跟着拼啦/);
  assert.match(render(first),/>看看跟拼作品<\/button>/);
  const html=render(ordinary);
- assert.equal((html.match(/class="avatar-card"/g)||[]).length,2);
+ assert.equal((html.match(/class="avatar-card"/g)||[]).length,0);
+ assert.equal((html.match(/class="avatar-name"/g)||[]).length,0);
  assert.equal((html.match(/class="work-img"/g)||[]).length,2);
- assert.match(html,/class="avatar-face"[\s\S]*class="avatar-name">小宇/);
+ assert.match(html,/class="work-name">小宇的作品/);
 });

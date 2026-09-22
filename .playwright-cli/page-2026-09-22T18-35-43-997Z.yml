@@ -1,0 +1,39 @@
+- generic [active] [ref=f1e1]:
+  - main "Zometool交互原型":
+    - generic [ref=f1e5]:
+      - generic [ref=f1e6]:
+        - button "返回首页" [ref=f1e7] [cursor=pointer]: ↩
+        - generic [ref=f1e8]: 消息通知
+      - navigation "消息分类" [ref=f1e9]:
+        - button "全部" [ref=f1e10] [cursor=pointer]
+        - button "系统消息" [ref=f1e12] [cursor=pointer]
+        - button "互动消息" [ref=f1e14] [cursor=pointer]
+      - article "消息详情" [ref=f1e17]:
+        - generic [ref=f1e18]:
+          - heading "你的创意，第一次有人跟着拼啦！" [level=2] [ref=f1e19]
+          - generic [ref=f1e20]: 刚刚
+        - generic [ref=f1e21]:
+          - generic [ref=f1e22]: 来自：造型库
+          - button "预览三角桥" [ref=f1e23] [cursor=pointer]: 原造型 🌉
+        - generic [ref=f1e24]: 小宇跟着你的「三角桥」拼出了新作品。
+        - generic [ref=f1e27]:
+          - button "小宇的个人主页" [ref=f1e28] [cursor=pointer]:
+            - generic [ref=f1e29]: 小
+            - generic [ref=f1e30]: 小宇
+          - generic [ref=f1e32]:
+            - button "预览蓝色小城" [ref=f1e33] [cursor=pointer]: 🌁
+            - generic [ref=f1e34]: 蓝色小城
+        - generic [ref=f1e35]:
+          - button "看看跟拼作品" [ref=f1e36] [cursor=pointer]
+          - button "删除消息" [ref=f1e37] [cursor=pointer]
+      - complementary [ref=f1e38]:
+        - generic [ref=f1e39]: 已读 1／共 1
+        - button "你的创意，第一次有人跟着拼啦！，已读" [pressed] [ref=f1e41] [cursor=pointer]:
+          - generic [ref=f1e42]: 🧱
+          - generic [ref=f1e43]:
+            - heading "你的创意，第一次有人跟着拼啦！" [level=3] [ref=f1e44]
+            - paragraph [ref=f1e45]: 刚刚
+        - generic [ref=f1e46]:
+          - button "一键已读" [disabled] [ref=f1e47]
+          - button "删除已读" [ref=f1e48] [cursor=pointer]
+      - button "体验设置" [ref=f1e50] [cursor=pointer]

@@ -1,5 +1,5 @@
-import {honorBanner} from './honor-visual.mjs?v=20260923-boundaries';
-import * as M from './model.mjs?v=20260923-boundaries';
+import {honorBanner} from './honor-visual.mjs?v=20260923-review2';
+import * as M from './model.mjs?v=20260923-review2';
 
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const interactive='role="button" tabindex="0"';
@@ -34,7 +34,8 @@ function detail(s,m,{detailLimit,networkFail,imageFail}){
   contents=`<div class="center-feedback" aria-label="具体评论内容">${events.slice(0,detailLimit).map(e=>`<div class="center-feedback-row">${person(e.actor)}<div class="center-feedback-copy"><div class="center-feedback-person"><b>共创达人${esc(e.actor.name)}</b><time>${time(e.at)}</time></div><p>${esc(e.text||'')}</p></div></div>`).join('')}${events.length>detailLimit?`<button class="more" data-action="more-detail">加载更多（剩余 ${events.length-detailLimit} 条）</button>`:''}</div>`;
  }else if(m.type==='follow_build'){
   const visible=events.filter(e=>e.work).slice(0,detailLimit),groups=[...new Map(visible.map(e=>[e.actor.id,e.actor])).values()];
-  contents=`<div class="followup-gallery"><div class="gallery-scroll">${groups.map(actor=>`<div class="follow-user-group">${person(actor)}<div class="follow-user-works">${visible.filter(e=>e.actor.id===actor.id).map(e=>workCard({...e.work,name:e.work.name||`${e.actor.name}的作品`},imageFail,'work','work-img')).join('')}</div></div>`).join('')}${events.length>detailLimit?`<button class="more" data-action="more-detail">加载更多（剩余 ${events.length-detailLimit} 件）</button>`:''}</div></div>`;
+  // 跟拼消息详情只展示各位跟拼者的作品，不再展示跟拼者的头像和昵称。
+  contents=`<div class="followup-gallery"><div class="gallery-scroll">${groups.map(actor=>`<div class="follow-user-group"><div class="follow-user-works">${visible.filter(e=>e.actor.id===actor.id).map(e=>workCard({...e.work,name:e.work.name||`${e.actor.name}的作品`},imageFail,'work','work-img')).join('')}</div></div>`).join('')}${events.length>detailLimit?`<button class="more" data-action="more-detail">加载更多（剩余 ${events.length-detailLimit} 件）</button>`:''}</div></div>`;
  }else if(M.isInteraction(m)){
   contents=`<div class="avatar-strip"><div class="gallery-scroll">${people.slice(0,detailLimit).map(person).join('')}${people.length>detailLimit?`<button class="more" data-action="more-detail">加载更多（剩余 ${people.length-detailLimit} 人）</button>`:''}</div></div>`;
  }else if(m.type==='model_batch'||m.type==='admission'){

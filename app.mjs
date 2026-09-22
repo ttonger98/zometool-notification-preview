@@ -1,9 +1,9 @@
-import {firstFollowPopup} from './follow-visual.mjs?v=20260923-review';
-import {honorBanner} from './honor-visual.mjs?v=20260923-review';
-import * as M from './model.mjs?v=20260923-review';
-import {renderCenter,visibleEventIds} from './center-view.mjs?v=20260923-review';
+import {firstFollowPopup} from './follow-visual.mjs?v=20260923-review2';
+import {honorBanner} from './honor-visual.mjs?v=20260923-review2';
+import * as M from './model.mjs?v=20260923-review2';
+import {renderCenter,visibleEventIds} from './center-view.mjs?v=20260923-review2';
 const demoScene=new URLSearchParams(location.search).get('demo');
-const KEY='zometool-notification-demo-20260923-review'+(demoScene?'-'+demoScene:''),LAUNCH=KEY+'-launch';
+const KEY='zometool-notification-demo-20260923-review2'+(demoScene?'-'+demoScene:''),LAUNCH=KEY+'-launch';
 const $=id=>document.getElementById(id),esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function load(){try{const data=JSON.parse(localStorage.getItem(KEY));if(data?.version===M.VERSION)return data;}catch{}return M.seeded();}
 let state=load(),launch;try{launch=JSON.parse(sessionStorage.getItem(LAUNCH));}catch{}

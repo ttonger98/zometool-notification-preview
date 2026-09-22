@@ -1,0 +1,16 @@
+- main "Zometool交互原型" [ref=e2]:
+  - generic [ref=e3]:
+    - heading [level=1] [ref=e4]:
+      - button "返回" [ref=e5] [cursor=pointer]: ↩
+      - text: 站外提醒演示
+    - generic [ref=e6]:
+      - generic [ref=e7]: 需求同步版 · 09.23
+      - button "体验设置" [ref=e8] [cursor=pointer]
+  - generic [ref=e9]:
+    - heading "APP 当前处于后台" [level=2] [ref=e10]
+    - paragraph [ref=e11]: 这里展示站外 Push 的交互示意，使用体验时钟与示例事件。
+    - button "Zometool · 刚刚 你的创意，第一次有人跟着拼啦！ 小宇跟拼了你的造型「三角桥」。去看看TA的作品吧！" [ref=e13] [cursor=pointer]:
+      - generic [ref=e14]: Zometool · 刚刚
+      - strong [ref=e15]: 你的创意，第一次有人跟着拼啦！
+      - generic [ref=e16]: 小宇跟拼了你的造型「三角桥」。去看看TA的作品吧！
+    - button "回到 APP 首页" [ref=e17] [cursor=pointer]

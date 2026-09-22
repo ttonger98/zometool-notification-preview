@@ -30,6 +30,8 @@ test('follow-build keeps original model above body and works in the original gal
  assert.match(meta(html),/data-label="原造型"[\s\S]*data-object="bridge"/);
  assert.match(article(html),/class="followup-gallery"><div class="gallery-scroll">[\s\S]*class="work-img"[\s\S]*data-object="child-work" data-context="work"/);
  assert.equal((article(html).match(/class="avatar-strip"/g)||[]).length,0);
+ assert.equal((article(html).match(/class="avatar-card"/g)||[]).length,0);
+ assert.equal((article(html).match(/class="avatar-name"/g)||[]).length,0);
 });
 test('admission and new-model batches use the retained attachment area',()=>{
  for(const type of ['admission','model_batch']){
