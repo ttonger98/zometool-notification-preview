@@ -4,7 +4,7 @@ import * as M from '../model.mjs';
 import {renderCenter} from '../center-view.mjs';
 
 const objectFor=t=>['honor','growth_star','follow'].includes(t)?M.OBJECTS.self:['admission','follow_build','model_batch'].includes(t)?M.OBJECTS.bridge:M.OBJECTS.wheel;
-const add=(s,type,extra={})=>M.receive(s,{type,object:objectFor(type),actor:{id:'user-'+s.seq,name:'小宇'},...extra});
+const add=(s,type,extra={})=>M.receive(s,{push:true,type,object:objectFor(type),actor:{id:'user-'+s.seq,name:'小宇'},...extra});
 const follow=(s,id,extra={})=>add(s,'follow_build',{id,actor:{id:'builder-'+id,name:'小宇'},work:{id:'work-'+id,name:'小宇的作品',icon:'🌁'},...extra});
 
 test('first follow stays independent before and after read, including concurrent same-model feedback',()=>{
@@ -70,13 +70,14 @@ test('all ordinary interaction types follow the published content-type order',()
  const comment=(kind,at)=>({id:kind,type:'expert_comment',object:{kind},at});
  assert.ok(M.compareNotifications(comment('work',0),comment('remix',M.MINUTE))<0);
 });
-test('new interaction chooses higher-priority waiting feedback without clock-only automatic sends',()=>{
+test('new interaction sends only its own message and leaves older higher-priority feedback untouched',()=>{
  const s=M.createState();s.mode='background';add(s,'like');M.advance(s,M.MINUTE);add(s,'favorite');
  const praise=add(s,'praise');
  M.advance(s,2*M.HOUR);assert.equal(s.pushes.length,2);
- add(s,'share');
- assert.equal(s.pushes.at(-1).messageId,praise.id);
- assert.equal(s.pushes.at(-1).type,'praise');
+ const fresh=add(s,'share');
+ assert.equal(s.pushes.at(-1).messageId,fresh.id);
+ assert.equal(s.pushes.at(-1).type,'share');
+ assert.ok(M.details(s,praise).every(e=>!e.handled));
 });
 test('unhandled popup is retained and re-ranked with new results on re-entry',()=>{
  const s=M.createState(),launch={device:'A'},admission=add(s,'admission');

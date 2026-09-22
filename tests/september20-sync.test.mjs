@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import * as M from '../model.mjs';
 import {renderCenter} from '../center-view.mjs';
 
-const add=(s,type,extra={})=>M.receive(s,{type,object:['honor','growth_star','follow'].includes(type)?M.OBJECTS.self:['follow_build','admission'].includes(type)?M.OBJECTS.bridge:M.OBJECTS.wheel,actor:{id:'user-'+s.seq,name:'小宇'},...extra});
+const add=(s,type,extra={})=>M.receive(s,{push:true,type,object:['honor','growth_star','follow'].includes(type)?M.OBJECTS.self:['follow_build','admission'].includes(type)?M.OBJECTS.bridge:M.OBJECTS.wheel,actor:{id:'user-'+s.seq,name:'小宇'},...extra});
 const follow=(s,user,object=M.OBJECTS.bridge,extra={})=>add(s,'follow_build',{actor:{id:user,name:user},object,work:{id:'upload-'+s.seq,name:user+'的作品'},...extra});
 
 test('bulk read covers unloaded records and all popup types, survives cleanup and another device',()=>{
@@ -63,9 +63,9 @@ test('deleted target excludes badge but preserves read state and history',()=>{
 test('official is first in a shared pending batch, with personal sends still exempt',()=>{
  const s=M.createState();add(s,'honor');add(s,'activity',{popup:true});follow(s,'a');add(s,'review');
  s.mode='background';M.flushQueue(s);
- assert.deepEqual(s.pushes.map(p=>p.type),['activity','honor','follow_build']);
+ assert.deepEqual(s.pushes.map(p=>p.type),['activity','honor']);
  assert.equal(M.round(s).used,1);
- M.advance(s,M.MINUTE);assert.equal(s.pushes.at(-1).type,'review');
+ M.advance(s,M.MINUTE);assert.deepEqual(s.pushes.slice(-2).map(p=>p.type),['follow_build','review']);
  assert.equal(M.round(s).used,2);
 });
 test('exhausted ordinary count does not block a lower-ranked exempt result',()=>{

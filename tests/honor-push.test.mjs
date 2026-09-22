@@ -19,5 +19,5 @@ test('creator and growth star honors have distinct visual and destination',()=>{
 });
 test('each message type has its own short opening prompt',()=>{
  const types=Object.keys(M.TYPES);assert.equal(new Set(types.map(M.pushGuide)).size,types.length);
- for(const type of types){const s=M.createState();s.mode='background';const object=Object.values(M.OBJECTS).find(o=>M.allowedKinds(type).includes(o.kind));M.receive(s,{type,object,actor:{id:'one',name:'小宇'}});assert.equal(s.pushes.length,1);assert.equal(s.pushes[0].body,M.pushGuide(type));assert.ok(s.pushes[0].body.length<=32);}
+ for(const type of types){const s=M.createState();s.mode='background';const object=Object.values(M.OBJECTS).find(o=>M.allowedKinds(type).includes(o.kind));M.receive(s,{push:true,type,object,actor:{id:'one',name:'小宇'}});assert.equal(s.pushes.length,1);assert.equal(s.pushes[0].body,M.pushGuide(type));assert.ok(s.pushes[0].body.length<=32);}
 });

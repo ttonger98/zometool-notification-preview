@@ -187,3 +187,5 @@ a{color:#367bb0}
 .follow-original,.follow-result{min-width:0;border:1px solid #dce8ee;border-radius:16px;background:#f2f7fb;padding:3px 8px 10px;display:flex;flex-direction:column;align-items:center}
 .follow-result{background:#fff6df;border-color:#f1ddb0}.follow-visual svg{height:130px;width:100%;max-width:180px}.follow-visual span{font-size:11px;color:#748391}.follow-visual strong{font-size:14px;color:#324964;max-width:100%;overflow-wrap:anywhere}.follow-arrow{font-size:27px;color:#b8a46d}.first-follow-dialog .dialog-actions{margin-top:8px}.first-follow-dialog .btn{font-size:13px;padding:9px 19px}
 @media(max-height:390px){.first-follow-dialog{padding:9px 22px}.follow-visual svg{height:109px}.first-follow-dialog h2{font-size:21px}}
+
+.follow-author{display:flex;align-items:center;justify-content:center;gap:6px}.follow-avatar{display:inline-flex!important;width:24px;height:24px;align-items:center;justify-content:center;border-radius:50%;background:#739ac7;color:white;font-size:12px;flex-shrink:0}

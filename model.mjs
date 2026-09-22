@@ -1,7 +1,8 @@
 // One deterministic domain model drives the center, simulated Push, and home reminders.
 export const MINUTE=60_000, HOUR=60*MINUTE, DAY=24*HOUR;
-export const VERSION='2026-09-20-review-sync';
+export const VERSION='2026-09-22-review';
 export const GROWTH_STAR_TITLE_TEMPLATE='太棒了！你是【年份】【月份】的Zometool成长之星！';
+export const COLLECTION_NAME='创意游乐园';
 export const INTERACTIONS=['like','favorite','share','follow_build','praise','expert_comment','follow'];
 export const PERSONAL=['admission','honor','growth_star','selected'];
 export const TYPES={
@@ -15,7 +16,7 @@ export const OBJECTS={
 };
 export const localDate=t=>new Date(t+8*HOUR).toISOString().slice(0,10);
 export function sendingHours(t){const h=new Date(t+8*HOUR).getUTCHours();return h>=7&&h<21;}
-export function createState(now=Date.parse('2026-09-10T10:00:00+08:00')){return {version:VERSION,now,seq:0,account:'self',messages:[],events:[],rounds:{},ordinaryRound:null,firstFollow:null,pushes:[],queue:[],lastPush:null,notifications:true,loggedIn:true,mode:'foreground'};}
+export function createState(now=Date.parse('2026-09-10T10:00:00+08:00')){return {version:VERSION,now,seq:0,account:'self',messages:[],events:[],rounds:{},ordinaryRound:null,firstFollow:null,pushes:[],queue:[],lastPush:null,lastPersonalPush:null,devices:{},notifications:true,loggedIn:true,mode:'foreground'};}
 export const isInteraction=m=>INTERACTIONS.includes(m.type);
 export const valid=(s,m)=>!m.deleted&&!m.offline&&s.now<m.expiresAt;
 export const unread=m=>m.events.some(id=>!m.readIds.includes(id));
@@ -28,7 +29,7 @@ export const objectLabel=m=>({model:'造型',work:'作品',remix:'跟拼作品',
 export function title(s,m){
  if(m.popupKind==='first_follow')return '你的创意，第一次有人跟着拼啦！';
  if(m.type==='growth_star'){
-  const [year,month]=localDate(m.createdAt).split('-');
+  const [year,month]=(m.awardPeriod||localDate(m.createdAt)).split('-');
   return GROWTH_STAR_TITLE_TEMPLATE.replace('【年份】',`${year}年`).replace('【月份】',`${Number(month)}月`);
  }
  const n=users(s,m).length,obj=objectLabel(m),person=n===1?'有人':`有${n}个人`;
@@ -50,15 +51,15 @@ export function body(s,m){
   if(m.type==='expert_comment')return `共创达人${who}评论了你的${objectLabel(m)}「${m.object.name}」：`;
   return `${who}${{like:'点赞了',favorite:'收藏了',share:'分享了',follow_build:'跟拼了',praise:'夸了夸'}[m.type]}你的${objectLabel(m)}「${m.object.name}」。`;
  }
- return {admission:`你的「${m.object.name}」入选官方造型库。更多小伙伴可以跟着你的创意一起拼搭啦！`,honor:'感谢你分享精彩创意！共创达人身份标识已点亮，去个人主页看看吧。',growth_star:'每一次动手，都藏着新的发现。你的拼搭故事登上本月成长之星，快来看看属于你的展示页！',selected:`你的作品「${m.object.name}」入选「创意游乐园」主题合集，快来看看你的精彩创作吧！`,review:`你的作品「${m.object.name}」需要调整。请上传主体清晰的作品封面，修改后可以重新提交审核。`,activity:'来参加创意拼搭活动吧！查看本期活动主题、参与方式和活动时间。',collection:'一起来看看小伙伴们的精彩创作，寻找你的下一份拼搭灵感吧！',model_batch:'本批上新3个造型：水晶城堡、三角桥、天空塔。一起来寻找新的拼搭灵感！',course:'学习新的拼搭技巧，探索稳定结构的奥秘。',feature:'造型库新增主题筛选，帮助你更快找到想拼的造型。',marketing:'本期创意活动已开启，查看活动内容和参与方式。'}[m.type];
+ return {admission:`你的「${m.object.name}」入选官方造型库。更多小伙伴可以跟着你的创意一起拼搭啦！`,honor:'感谢你分享精彩创意！共创达人身份标识已点亮，去个人主页看看吧。',growth_star:'每一次动手，都藏着新的发现。你的拼搭故事入选成长之星，快来看看属于你的展示页！',selected:`你的作品「${m.object.name}」入选「${COLLECTION_NAME}」主题合集，快来看看你的精彩创作吧！`,review:`你的作品「${m.object.name}」需要调整。请上传主体清晰的作品封面，修改后可以重新提交审核。`,activity:'来参加创意拼搭活动吧！查看本期活动主题、参与方式和活动时间。',collection:'一起来看看小伙伴们的精彩创作，寻找你的下一份拼搭灵感吧！',model_batch:'本批上新3个造型：水晶城堡、三角桥、天空塔。一起来寻找新的拼搭灵感！',course:'学习新的拼搭技巧，探索稳定结构的奥秘。',feature:'造型库新增主题筛选，帮助你更快找到想拼的造型。',marketing:'本期创意活动已开启，查看活动内容和参与方式。'}[m.type];
 }
 export function target(m,context='main'){
  if(context==='image')return `${objectLabel(m)}详情`;
  if(m.type==='review')return '作品修改';
  if(m.type==='admission')return ['main','popup'].includes(context)?'个人主页 · 入库造型':'造型详情';
  if(m.type==='honor')return '个人主页 · 共创达人';
- if(m.type==='growth_star')return '成长之星 · 本期展示';
- if(m.type==='selected')return '主题合集 · 创意游乐园';
+ if(m.type==='growth_star')return `成长之星 · ${(m.awardPeriod||localDate(m.createdAt)).slice(0,7)}`;
+ if(m.type==='selected')return `主题合集 · ${COLLECTION_NAME}`;
  if(m.type==='follow_build')return '原造型 · 跟拼作品列表';
  if(m.type==='expert_comment')return `${objectLabel(m)}详情 · 达人评论`;
  return {activity:'活动主页',collection:'本期作品集',model_batch:'造型库 · 上新',course:'课程介绍',feature:'造型库 · 主题筛选',marketing:'活动主页',follow:'用户个人主页'}[m.type]||`${objectLabel(m)}详情`;
@@ -69,7 +70,17 @@ export const personal=m=>PERSONAL.includes(m.type);
 export const official=m=>!personal(m)&&!isInteraction(m)&&m.type!=='review';
 export const deliveryActive=(s,m)=>!official(m)||(s.now>=(m.publishedAt??m.createdAt)&&s.now<(m.deliveryExpiresAt??Infinity));
 export const personalPush=e=>personal(e)||e.specialPush==='first_follow';
-const pushGate=s=>s.loggedIn&&s.notifications&&s.mode==='background'&&sendingHours(s.now);
+export function setDevice(s,id,changes={}){
+ s.devices??={};s.devices[id]={mode:'foreground',loggedIn:true,notifications:true,lastUsed:s.now,...s.devices[id],...changes};
+ if(changes.mode==='foreground')s.devices[id].lastUsed=s.now;
+}
+export function deliveryDevice(s){
+ const devices=Object.entries(s.devices||{}).filter(([,d])=>d.loggedIn);
+ if(!Object.keys(s.devices||{}).length)return s.loggedIn&&s.notifications&&s.mode==='background'?'local':null;
+ if(devices.some(([,d])=>d.mode==='foreground'))return null;
+ return devices.filter(([,d])=>d.notifications).sort((a,b)=>b[1].lastUsed-a[1].lastUsed||a[0].localeCompare(b[0]))[0]?.[0]||null;
+}
+const pushGate=s=>!s.batchReceiving&&!!deliveryDevice(s)&&sendingHours(s.now);
 const firstFollow=e=>e.specialPush==='first_follow'||e.popupKind==='first_follow';
 const priority=e=>official(e)?0:personal(e)?1:firstFollow(e)?2:e.type==='expert_comment'?3:e.type==='review'?5:4;
 const typePriority=e=>{
@@ -81,13 +92,13 @@ const typePriority=e=>{
 };
 // The same channel ordering applies before time is used as a tie-breaker.
 export const compareNotifications=(a,b)=>priority(a)-priority(b)||typePriority(a)-typePriority(b)||(b.at??b.latestAt)-(a.at??a.latestAt)||(b.order??0)-(a.order??0)||String(b.id).localeCompare(String(a.id));
-function pushEligible(s,e){const m=eventMessage(s,e);return pushGate(s)&&m&&deliveryActive(s,m)&&(personalPush(e)||(round(s).remaining>0&&(s.lastPush===null||s.now-s.lastPush>=MINUTE)));}
+function pushEligible(s,e){const m=eventMessage(s,e);return pushGate(s)&&m&&deliveryActive(s,m)&&(personalPush(e)?(s.lastPersonalPush==null||s.now-s.lastPersonalPush>=MINUTE):(round(s).remaining>0&&(s.lastPush===null||s.now-s.lastPush>=MINUTE)));}
 function eventMessage(s,e){return s.messages.find(m=>m.id===e.messageId);}
-function pending(s,e){const m=eventMessage(s,e);return !e.handled&&!e.viewed&&m&&valid(s,m)&&m.targetAvailable&&(!official(m)||s.now<(m.deliveryExpiresAt??Infinity));}
+function pending(s,e){const m=eventMessage(s,e);return e.pushEnabled!==false&&!e.invalidated&&!e.handled&&!e.viewed&&m&&!m.reminderStopped&&valid(s,m)&&m.targetAvailable&&(!official(m)||s.now<(m.deliveryExpiresAt??Infinity));}
 function recordPush(s,m,events){
  events=[...events].sort((a,b)=>a.at-b.at||a.id.localeCompare(b.id));
  const latest=events.at(-1),n=new Set(events.map(e=>e.actor.id)).size;
- const push={id:`push-${++s.seq}`,messageId:m.id,type:m.type,at:s.now,eventIds:events.map(e=>e.id),latestEventId:latest.id,title:isInteraction(m)?(n>1?`${latest.actor.name}等${n}位小伙伴`:`${latest.actor.name}`)+({like:'赞了',favorite:'收藏了',share:'分享了',follow_build:'跟拼了',praise:'夸了夸',expert_comment:'评论了',follow:'关注了'}[m.type])+(m.type==='follow'?'你':`你的${objectLabel(m)}「${m.object.name}」`):title(s,m)};
+ const push={id:`push-${++s.seq}`,messageId:m.id,type:m.type,deviceId:deliveryDevice(s),at:s.now,eventIds:events.map(e=>e.id),latestEventId:latest.id,title:isInteraction(m)?(n>1?`${latest.actor.name}等${n}位小伙伴`:`${latest.actor.name}`)+({like:'赞了',favorite:'收藏了',share:'分享了',follow_build:'跟拼了',praise:'夸了夸',expert_comment:'评论了',follow:'关注了'}[m.type])+(m.type==='follow'?'你':`你的${objectLabel(m)}「${m.object.name}」`):title(s,m)};
  push.specialPush=latest.specialPush||null;
  if(latest.specialPush==='first_follow'){
   push.title='你的创意，第一次有人跟着拼啦！';
@@ -95,36 +106,40 @@ function recordPush(s,m,events){
   if(s.firstFollow)s.firstFollow.locked=true;
  }else push.body=m.type==='follow'&&n>1?'来看看，哪些新朋友关注了你。':pushGuide(m.type);
  if(!personalPush(latest)){const r=round(s);s.ordinaryRound={start:r.start??s.now,used:r.used+1};}
- events.forEach(e=>e.handled=true);s.pushes.push(push);if(!personalPush(latest))s.lastPush=s.now;return push;
+ events.forEach(e=>e.handled=true);s.pushes.push(push);if(personalPush(latest))s.lastPersonalPush=s.now;else s.lastPush=s.now;if(m.type==='follow')m.pushClosed=true;return push;
 }
-export function clickPush(s,id){if(!s.pushes.some(p=>p.id===id))return false;s.ordinaryRound=null;s.mode='foreground';return true;}
+export function clickPush(s,id,deviceId){if(!s.pushes.some(p=>p.id===id))return false;s.ordinaryRound=null;s.mode='foreground';if(deviceId)setDevice(s,deviceId,{mode:'foreground'});return true;}
 function releaseAt(t){const hour=new Date(t+8*HOUR).getUTCHours();return Date.parse(localDate(t+(hour>=21?DAY:0))+'T07:00:00+08:00');}
 export function flushQueue(s,incoming=null){
+ reconcileReminders(s);
+ // Waiting result/official/rejection events become part of the same cross-night batch.
+ for(const e of s.events)if(pending(s,e)&&!e.quietUntil&&(!isInteraction(e)||personalPush(e))&&releaseAt(e.queuedAt??e.at)<=s.now){
+  const nextMorning=sendingHours(e.queuedAt??e.at)?Date.parse(localDate(e.queuedAt??e.at)+'T07:00:00+08:00')+DAY:releaseAt(e.queuedAt??e.at);
+  if(nextMorning<=s.now)e.quietUntil=nextMorning;
+ }
  s.queue=s.queue.filter(id=>{const e=s.events.find(e=>e.id===id);return e&&pending(s,e);});
  if(!pushGate(s))return null;
- // All overdue quiet-period items share one catch-up opportunity, not one per day/type.
  const quiet=s.events.filter(e=>e.quietUntil&&e.quietUntil<=s.now&&!e.quietReleased);
  let sent=null;
  if(quiet.length){
-  const candidates=quiet.filter(e=>pending(s,e)).sort(compareNotifications);
-  const e=candidates.find(e=>pushEligible(s,e));if(!e&&candidates.length)return null;
-  if(e)sent=recordPush(s,eventMessage(s,e),[e]);
-  quiet.forEach(e=>{e.quietReleased=true;e.handled=true;});
-  s.queue=s.queue.filter(id=>!quiet.some(e=>e.id===id));
-  if(sent)return sent;
+  const candidates=quiet.filter(e=>pending(s,e)).sort(compareNotifications),e=candidates.find(e=>pushEligible(s,e));
+  // 跨夜这一批暂时没有符合发送条件的消息时保持等待，不阻塞当天新消息。
+  if(e){
+   const m=eventMessage(s,e),events=isInteraction(m)&&!personalPush(e)?s.events.filter(x=>x.messageId===m.id&&!personalPush(x)&&pending(s,x)):[e];
+   sent=recordPush(s,m,events);
+   quiet.forEach(x=>{x.quietReleased=true;x.handled=true;});
+   s.queue=s.queue.filter(id=>!quiet.some(x=>x.id===id));
+  }
  }
  const candidates=s.queue.map(id=>s.events.find(e=>e.id===id)).filter(e=>pending(s,e)&&!e.quietUntil);
- if(incoming&&pending(s,incoming)&&!incoming.quietUntil){
-  // A new interaction can trigger an eligible older interaction of higher priority.
-  // Merely advancing the clock still does not send an ordinary interaction.
-  candidates.push(...s.events.filter(e=>isInteraction(e)&&pending(s,e)&&!e.quietUntil));
- }
+ const incomingEvents=Array.isArray(incoming)?incoming:incoming?[incoming]:[];
+ for(const e of incomingEvents)if(pending(s,e)&&!e.quietUntil)candidates.push(e);
  candidates.sort(compareNotifications);
  for(const e of candidates){
   const m=eventMessage(s,e);if(!pending(s,e)||!pushEligible(s,e))continue;
   const events=isInteraction(m)&&!personalPush(e)?s.events.filter(x=>x.messageId===m.id&&!personalPush(x)&&pending(s,x)&&(!x.quietUntil||x.quietReleased)):[e];
+  if(!events.length)continue;
   sent=recordPush(s,m,events);s.queue=s.queue.filter(id=>!events.some(x=>x.id===id));
-  // The interval gate blocks another ordinary Push, but not exempt personal results.
  }
  return sent;
 }
@@ -143,7 +158,7 @@ function registerFirstFollow(s,m,e){
  e.specialPush='first_follow';
 }
 export function targetValid(s,m){return !m.deleted&&!m.offline&&m.targetAvailable&&(m.popupPersistent||valid(s,m));}
-export function popupValid(s,m){return targetValid(s,m)&&deliveryActive(s,m)&&(m.popupPersistent||(s.now>=m.popupStart&&s.now<m.popupEnd));}
+export function popupValid(s,m){return !m.reminderStopped&&targetValid(s,m)&&deliveryActive(s,m)&&(m.popupPersistent||(s.now>=m.popupStart&&s.now<m.popupEnd));}
 export function receive(s,input){
  const type=input.type;if(!TYPES[type])throw Error('Unknown message type');
  if(!allowedKinds(type).includes((input.object||OBJECTS.wheel).kind))return null;
@@ -153,18 +168,18 @@ export function receive(s,input){
  const object={...(input.object||OBJECTS.wheel)},at=input.at??s.now,actor=input.actor||{id:'official',name:'Zometool官方',color:'#4ea5df'};
  const prior=s.events.find(e=>e.type===type&&e.object.id===object.id&&e.actor.id===actor.id);
  if(prior&&['like','favorite','follow','follow_build'].includes(type))return eventMessage(s,prior);
- const e={...input,id:input.id||`event-${++s.seq}`,type,at,object,actor,handled:false,viewed:false};
+ const e={...input,id:input.id||`event-${++s.seq}`,type,at,object,actor,handled:false,viewed:false,queuedAt:s.now,pushEnabled:!input.silent&&(input.push??(!official({type}))) };
  const interaction=INTERACTIONS.includes(type),aggregate=interaction&&type!=='expert_comment'&&!isFirstFollowCandidate(s,e);
- let m=aggregate?s.messages.findLast(m=>valid(s,m)&&unread(m)&&m.popupKind!=='first_follow'&&m.type===type&&m.object.id===object.id&&at>=m.createdAt&&at-m.createdAt<HOUR):null;
+ let m=aggregate?s.messages.findLast(m=>valid(s,m)&&unread(m)&&!m.reminderStopped&&m.popupKind!=='first_follow'&&!(type==='follow'&&m.pushClosed)&&m.type===type&&m.object.id===object.id&&at>=m.createdAt&&at-m.createdAt<HOUR):null;
  if(!m){
   const publishedAt=input.publishedAt??at,deliveryExpiresAt=input.deliveryExpiresAt??input.expiresAt??at+90*DAY;
-  m={id:`message-${++s.seq}`,order:s.seq,type,object,category:interaction?'feedback':'system',source:interaction?(object.kind==='model'||object.kind==='remix'?'造型库':'作品圈'):'Zometool官方',createdAt:at,latestAt:at,expiresAt:at+90*DAY,publishedAt,deliveryExpiresAt,events:[],readIds:[],popup:PERSONAL.includes(type)||(input.popup===true&&!interaction&&type!=='review'),popupState:'pending',popupStart:Math.max(publishedAt,input.popupStart??at),popupEnd:Math.min(deliveryExpiresAt,input.popupEnd??deliveryExpiresAt),popupPersistent:PERSONAL.includes(type),targetAvailable:true,title:interaction?undefined:input.title,text:interaction?undefined:input.text};
+  m={id:`message-${++s.seq}`,order:s.seq,type,object,category:interaction?'feedback':'system',source:interaction?(object.kind==='model'||object.kind==='remix'?'造型库':'作品圈'):'Zometool官方',createdAt:at,latestAt:at,expiresAt:at+90*DAY,publishedAt,deliveryExpiresAt,events:[],readIds:[],popup:PERSONAL.includes(type)||(input.popup===true&&!interaction&&type!=='review'),popupState:'pending',popupStart:Math.max(publishedAt,input.popupStart??at),popupEnd:Math.min(deliveryExpiresAt,input.popupEnd??deliveryExpiresAt),popupPersistent:PERSONAL.includes(type),targetAvailable:true,awardPeriod:input.awardPeriod||localDate(at).slice(0,7),title:interaction?undefined:input.title,text:interaction?undefined:input.text};
   s.messages.push(m);
  }
  e.messageId=m.id;m.events.push(e.id);m.latestAt=Math.max(m.latestAt,at);s.events.push(e);
  registerFirstFollow(s,m,e);
  if(input.silent)return m;
- if(input.push!==false){
+ if(e.pushEnabled){
   if(!sendingHours(s.now)){e.quietUntil=releaseAt(s.now);}
   else if(!interaction||personalPush(e))s.queue.push(e.id);
   flushQueue(s,interaction?e:null);
@@ -172,17 +187,18 @@ export function receive(s,input){
  return m;
 }
 export function view(s,id){
- const m=findMessage(s,id);if(!m||(!valid(s,m)&&!popupValid(s,m)))return false;
+ const m=findMessage(s,id);if(!m)return false;
  const ids=m.events;
  m.readIds=[...new Set([...m.readIds,...ids.filter(id=>m.events.includes(id))])];
  s.events.filter(e=>ids.includes(e.id)).forEach(e=>{e.viewed=true;e.handled=true;});
- completeReminder(s,m);return true;
+ stopReminder(s,m);return true;
 }
 // Sort feedback from the same received batch before choosing the first celebration.
 export function receiveBatch(s,inputs){
- const mode=s.mode;s.mode='foreground';
+ const seen=new Set(s.events.map(e=>e.id));
+ s.batchReceiving=true;
  const messages=[...inputs].sort((a,b)=>(a.at??s.now)-(b.at??s.now)||String(a.id||'').localeCompare(String(b.id||''))).map(input=>receive(s,input));
- s.mode=mode;flushQueue(s);return messages;
+ s.batchReceiving=false;flushQueue(s,s.events.filter(e=>!seen.has(e.id)));return messages;
 }
 export function pushDestination(s,p){
  const m=findMessage(s,p.messageId),events=p.eventIds.map(id=>s.events.find(e=>e.id===id)).filter(Boolean);
@@ -190,8 +206,8 @@ export function pushDestination(s,p){
  return {kind:'target',messageId:m?.id,actor:m?.type==='follow'?events.at(-1)?.actor:null,commentId:m?.type==='praise'?p.latestEventId:null};
 }
 function completeReminder(s,m){m.popupState='completed';if(m.popupKind==='first_follow'&&s.firstFollow)s.firstFollow.locked=true;}
-export function readAll(s,category){list(s,category).forEach(m=>{m.readIds=[...m.events];completeReminder(s,m);});}
-export function remove(s,id){const m=findMessage(s,id);if(!m)return;m.deleted=true;completeReminder(s,m);details(s,m).forEach(e=>e.handled=true);}
+export function readAll(s,category){list(s,category).forEach(m=>{m.readIds=[...m.events];stopReminder(s,m);});}
+export function remove(s,id){const m=findMessage(s,id);if(!m)return;m.deleted=true;stopReminder(s,m);}
 export function removeRead(s,category){list(s,category).filter(m=>!unread(m)).forEach(m=>remove(s,m.id));}
 export function advance(s,ms){s.now+=ms;flushQueue(s);}
 // Leaving the home screen does not dismiss an unhandled reminder.
@@ -200,19 +216,37 @@ export function suspendPopup(s,launch){
  launch.shown=null;
 }
 export function homePopup(s,launch){
- if(!s.loggedIn)return null;
+ reconcileReminders(s);
+ if(!s.loggedIn||s.devices?.[launch.device]?.loggedIn===false||s.devices?.[launch.device]?.mode==='background')return null;
  const active=findMessage(s,launch.shown);
  if(active?.popupState==='shown'&&popupValid(s,active))return null;
  launch.shown=null;
  launch.screened=true;
  const candidates=s.messages.filter(m=>m.popup&&m.popupState==='pending'&&popupValid(s,m)&&s.now>=m.popupStart&&(m.popupPersistent||s.now<m.popupEnd));
  // One official popup per launch comes first; then continue all personal reminders.
- const m=candidates.filter(m=>m.popupPersistent||!launch.officialChecked).sort(compareNotifications)[0];
+ const m=candidates.filter(m=>m.popupPersistent?(launch.personalCloses||0)<2:!launch.officialChecked).sort(compareNotifications)[0];
  if(m&&!m.popupPersistent)launch.officialChecked=true;
  if(m){launch.shown=m.id;launch.specialChain=!!m.popupPersistent;m.popupState='shown';m.popupDevice=launch.device;if(m.popupKind==='first_follow')s.firstFollow.locked=true;}
  return m||null;
 }
-export function closePopup(s,id){const m=findMessage(s,id);if(m)completeReminder(s,m);}
+export function closePopup(s,id,launch){const m=findMessage(s,id);if(!m||m.popupState==='completed')return;if(launch&&m.popupPersistent)launch.personalCloses=(launch.personalCloses||0)+1;stopReminder(s,m);}
+export function enterHome(launch){launch.personalCloses=0;}
+function stopReminder(s,m){m.reminderStopped=true;completeReminder(s,m);details(s,m).forEach(e=>e.handled=true);s.queue=s.queue.filter(id=>!m.events.includes(id));}
+export function resubmit(s,objectId){for(const m of s.messages)if(m.type==='review'&&m.object.id===objectId){m.reviewStatus='reviewing';stopReminder(s,m);}}
+export function invalidateTarget(s,id){const m=findMessage(s,id);if(m){m.targetAvailable=false;stopReminder(s,m);}}
+export function invalidateFeedback(s,eventId){const e=s.events.find(e=>e.id===eventId);if(!e)return;e.invalidated=true;e.handled=true;s.queue=s.queue.filter(id=>id!==eventId);const m=eventMessage(s,e);if(m?.popupKind==='first_follow'&&m.firstFollowEventId===eventId)stopReminder(s,m);}
+// 互动被取消：历史记录保留，尚未发送的提醒不再包含该互动。
+export function cancelInteraction(s,eventId){const e=s.events.find(x=>x.id===eventId);if(!e)return;e.cancelled=true;invalidateFeedback(s,eventId);}
+function reconcileReminders(s){for(const m of s.messages){
+ if(m.deleted||m.offline||!m.targetAvailable||(official(m)&&s.now>=(m.deliveryExpiresAt??Infinity)))stopReminder(s,m);
+ for(const e of details(s,m))if(e.work?.available===false)invalidateFeedback(s,e.id);
+}}
+export function openNotification(s,id,{success=true,source='notification'}={}){
+ if(!success)return {status:'failed',read:false};
+ if(source==='direct')return {status:'opened',read:false};
+ const m=findMessage(s,id);if(!m)return {status:'missing',read:false};
+ view(s,id);return {status:m.targetAvailable?'opened':'unavailable',read:valid(s,m)};
+}
 export function formatTime(t,now){
  const diff=Math.max(0,now-t),date=localDate(t),today=localDate(now),d=new Date(t+8*HOUR),n=new Date(now+8*HOUR),hhmm=d.toISOString().slice(11,16);
  if(diff<MINUTE)return '刚刚';if(diff<HOUR)return `${Math.floor(diff/MINUTE)}分钟前`;
