@@ -1,5 +1,5 @@
-import {honorBanner} from './honor-visual.mjs?v=20260923-review3';
-import * as M from './model.mjs?v=20260923-review3';
+import {honorBanner} from './honor-visual.mjs?v=20260923-review4';
+import * as M from './model.mjs?v=20260923-review4';
 
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const interactive='role="button" tabindex="0"';

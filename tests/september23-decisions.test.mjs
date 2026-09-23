@@ -28,12 +28,12 @@ test('个人成果弹窗展示即结束：停止待发Push、其他设备与重�
  assert.equal(M.homePopup(s,{device:'A'}),null);
 });
 
-test('首页弹窗不受发送时段限制；官方通知弹窗离开首页后仍可再次展示',()=>{
+test('首页弹窗不受发送时段限制；可重复展示的官方通知离开首页后仍可再次展示',()=>{
  const s=M.createState(Date.parse('2026-09-10T23:00:00+08:00')),launch={device:'A'};
  const m=add(s,'honor');
  assert.equal(M.sendingHours(s.now),false);
  assert.equal(M.homePopup(s,launch).id,m.id);
- const t=M.createState(),l2={device:'A'},o=add(t,'activity',{popup:true});
+ const t=M.createState(),l2={device:'A'},o=add(t,'activity',{popup:true,popupTotalLimit:2});
  assert.equal(M.homePopup(t,l2).id,o.id);
  M.suspendPopup(t,l2);
  assert.equal(M.homePopup(t,l2),null);

@@ -92,10 +92,21 @@ test('a displayed personal result ends its reminder while a newer result still s
 });
 test('official display is consumed only when shown; background does not reset launch count',()=>{
  const s=M.createState(),launch={device:'A'};assert.equal(M.homePopup(s,launch),null);
- const official=add(s,'activity',{popup:true});assert.equal(M.homePopup(s,launch).id,official.id);
+ const official=add(s,'activity',{popup:true,popupTotalLimit:3});assert.equal(M.homePopup(s,launch).id,official.id);
  M.suspendPopup(s,launch);
  assert.equal(M.homePopup(s,launch),null);
  assert.equal(M.homePopup(s,{device:'A'}).id,official.id);
+});
+test('official notice defaults to a single popup; a repeatable limit allows showing again',()=>{
+ const once=M.createState(),a={device:'A'},one=add(once,'activity',{popup:true});
+ assert.equal(M.homePopup(once,a).id,one.id);
+ M.suspendPopup(once,a);
+ assert.equal(M.homePopup(once,a),null);
+ assert.equal(M.homePopup(once,{device:'B'}),null);
+ const repeat=M.createState(),b={device:'A'},two=add(repeat,'activity',{popup:true,popupTotalLimit:3});
+ assert.equal(M.homePopup(repeat,b).id,two.id);
+ M.suspendPopup(repeat,b);
+ assert.equal(M.homePopup(repeat,{device:'B'}).id,two.id);
 });
 test('suspending one device does not release a popup displayed by another device',()=>{
  const s=M.createState(),m=add(s,'honor');M.homePopup(s,{device:'A'});

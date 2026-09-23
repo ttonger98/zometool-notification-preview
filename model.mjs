@@ -1,6 +1,6 @@
 // One deterministic domain model drives the center, simulated Push, and home reminders.
 export const MINUTE=60_000, HOUR=60*MINUTE, DAY=24*HOUR;
-export const VERSION='2026-09-23-review';
+export const VERSION='2026-09-23-review4';
 export const GROWTH_STAR_TITLE_TEMPLATE='太棒了！你是【年份】【月份】的Zometool成长之星！';
 export const COLLECTION_NAME='创意游乐园';
 export const INTERACTIONS=['like','favorite','share','follow_build','praise','expert_comment','follow'];
@@ -16,7 +16,7 @@ export const OBJECTS={
 };
 export const localDate=t=>new Date(t+8*HOUR).toISOString().slice(0,10);
 export function sendingHours(t){const h=new Date(t+8*HOUR).getUTCHours();return h>=7&&h<21;}
-export function createState(now=Date.parse('2026-09-10T10:00:00+08:00')){return {version:VERSION,now,seq:0,account:'self',messages:[],events:[],rounds:{},ordinaryRound:null,firstFollow:null,pushes:[],queue:[],lastPush:null,lastPersonalPush:null,devices:{},notifications:true,loggedIn:true,mode:'foreground'};}
+export function createState(now=Date.parse('2026-09-10T10:00:00+08:00')){return {version:VERSION,now,seq:0,account:'self',messages:[],events:[],rounds:{},ordinaryRound:null,firstFollow:null,pushes:[],queue:[],lastPush:null,lastPersonalPush:null,devices:{},notifications:true,loggedIn:true,mode:'foreground',viewerTags:[]};}
 export const isInteraction=m=>INTERACTIONS.includes(m.type);
 export const valid=(s,m)=>!m.deleted&&!m.offline&&s.now<m.expiresAt;
 export const unread=m=>m.events.some(id=>!m.readIds.includes(id));
@@ -71,6 +71,18 @@ export function target(m,context='main'){
 export function round(s){const r=s.ordinaryRound;return r&&s.now<r.start+2*HOUR?{...r,remaining:2-r.used,ends:r.start+2*HOUR}:{used:0,remaining:2,start:null,ends:null};}
 export const personal=m=>PERSONAL.includes(m.type);
 export const official=m=>!personal(m)&&!isInteraction(m)&&m.type!=='review';
+// 官方通知弹窗的运营配置：优先级、覆盖标签、每日与累计展示次数。
+export const officialTypeIndex=m=>['activity','model_batch','collection','feature','course','marketing'].indexOf(m.type);
+export const popupAudienceMatch=(s,m)=>!m.popupTags?.length||m.popupTags.some(tag=>(s.viewerTags||[]).includes(tag));
+export const popupTotalReached=(s,m)=>m.popupTotalLimit!=null&&(m.shownTotal||0)>=m.popupTotalLimit;
+export const popupDailyReached=(s,m)=>m.popupDailyLimit!=null&&m.shownDayKey===localDate(s.now)&&(m.shownDayCount||0)>=m.popupDailyLimit;
+export const popupLimitsReached=(s,m)=>popupTotalReached(s,m)||popupDailyReached(s,m);
+export const officialPopupAvailable=(s,m)=>official(m)&&m.popup&&!m.deleted&&m.targetAvailable&&!m.reminderStopped&&m.popupState!=='completed'&&!popupLimitsReached(s,m)&&popupAudienceMatch(s,m);
+function recordPopupShown(s,m){
+ m.shownTotal=(m.shownTotal||0)+1;
+ const day=localDate(s.now);
+ if(m.shownDayKey===day)m.shownDayCount=(m.shownDayCount||0)+1;else{m.shownDayKey=day;m.shownDayCount=1;}
+}
 export const deliveryActive=(s,m)=>!official(m)||(s.now>=(m.publishedAt??m.createdAt)&&s.now<(m.deliveryExpiresAt??Infinity));
 export const personalPush=e=>personal(e)||e.specialPush==='first_follow';
 export function setDevice(s,id,changes={}){
@@ -176,7 +188,11 @@ export function receive(s,input){
  let m=aggregate?s.messages.findLast(m=>valid(s,m)&&unread(m)&&!m.reminderStopped&&m.popupKind!=='first_follow'&&!(type==='follow'&&m.pushClosed)&&m.type===type&&m.object.id===object.id&&at>=m.createdAt&&at-m.createdAt<HOUR):null;
  if(!m){
   const publishedAt=input.publishedAt??at,deliveryExpiresAt=input.deliveryExpiresAt??input.expiresAt??at+90*DAY;
-  m={id:`message-${++s.seq}`,order:s.seq,type,object,category:interaction?'feedback':'system',source:interaction?(object.kind==='model'||object.kind==='remix'?'造型库':'作品圈'):'Zometool官方',createdAt:at,latestAt:at,expiresAt:at+90*DAY,publishedAt,deliveryExpiresAt,events:[],readIds:[],popup:PERSONAL.includes(type)||(input.popup===true&&!interaction&&type!=='review'),popupState:'pending',popupStart:Math.max(publishedAt,input.popupStart??at),popupEnd:Math.min(deliveryExpiresAt,input.popupEnd??deliveryExpiresAt),popupPersistent:PERSONAL.includes(type),targetAvailable:true,awardPeriod:input.awardPeriod||localDate(at).slice(0,7),title:interaction?undefined:input.title,text:interaction?undefined:input.text};
+  const isPersonal=PERSONAL.includes(type),isOfficial=!isPersonal&&!interaction&&type!=='review';
+  m={id:`message-${++s.seq}`,order:s.seq,type,object,category:interaction?'feedback':'system',source:interaction?(object.kind==='model'||object.kind==='remix'?'造型库':'作品圈'):'Zometool官方',createdAt:at,latestAt:at,expiresAt:at+90*DAY,publishedAt,deliveryExpiresAt,events:[],readIds:[],popup:isPersonal||(input.popup===true&&isOfficial),popupState:'pending',popupStart:Math.max(publishedAt,input.popupStart??at),popupEnd:Math.min(deliveryExpiresAt,input.popupEnd??deliveryExpiresAt),popupPersistent:isPersonal,targetAvailable:true,awardPeriod:input.awardPeriod||localDate(at).slice(0,7),title:interaction?undefined:input.title,text:interaction?undefined:input.text,
+   popupPriority:isOfficial?(input.popupPriority??null):null,popupTags:isOfficial?(input.popupTags??null):null,
+   popupDailyLimit:isOfficial?(input.popupDailyLimit??null):null,popupTotalLimit:isOfficial?(input.popupTotalLimit===undefined?1:input.popupTotalLimit):null,
+   shownTotal:0,shownDayKey:null,shownDayCount:0};
   s.messages.push(m);
  }
  e.messageId=m.id;m.events.push(e.id);m.latestAt=Math.max(m.latestAt,at);s.events.push(e);
@@ -213,10 +229,23 @@ export function readAll(s,category){list(s,category).forEach(m=>{m.readIds=[...m
 export function remove(s,id){const m=findMessage(s,id);if(!m)return;m.deleted=true;stopReminder(s,m);}
 export function removeRead(s,category){list(s,category).filter(m=>!unread(m)).forEach(m=>remove(s,m.id));}
 export function advance(s,ms){s.now+=ms;flushQueue(s);}
-// 个人成果弹窗在展示时即结束提醒，离开首页不再恢复；官方通知未处理时保留，下次进入首页继续检查。
+// 个人成果弹窗在展示时即结束提醒，离开首页不再恢复；官方通知按展示时间、覆盖标签与展示次数反复判断。
 export function suspendPopup(s,launch){
+ // 官方通知是否还能展示由展示次数与覆盖标签实时判断，离开首页只结束本次展示。
  for(const m of s.messages)if(m.popupState==='shown'&&m.popupDevice===launch.device)m.popupState=m.popupPersistent?'completed':'pending';
  launch.shown=null;
+}
+// 官方通知之间按运营优先级排序；未配置时回落到现有类型顺序，再按发布时间。个人成果仍按原顺位规则。
+export function comparePopups(a,b){
+ const pa=priority(a),pb=priority(b);
+ if(pa===0&&pb===0){
+  const la=a.popupPriority??officialTypeIndex(a),lb=b.popupPriority??officialTypeIndex(b);
+  if(la!==lb)return la-lb;
+  const ta=officialTypeIndex(a),tb=officialTypeIndex(b);
+  if(ta!==tb)return ta-tb;
+  return (b.at??b.latestAt)-(a.at??a.latestAt)||(b.order??0)-(a.order??0)||String(b.id).localeCompare(String(a.id));
+ }
+ return compareNotifications(a,b);
 }
 export function homePopup(s,launch){
  reconcileReminders(s);
@@ -225,18 +254,30 @@ export function homePopup(s,launch){
  if(active?.popupState==='shown')return null;
  launch.shown=null;
  launch.screened=true;
- const candidates=s.messages.filter(m=>m.popup&&m.popupState==='pending'&&popupValid(s,m)&&s.now>=m.popupStart&&(m.popupPersistent||s.now<m.popupEnd));
+ const candidates=s.messages.filter(m=>{
+  if(!m.popup||m.popupState!=='pending')return false;
+  if(m.popupPersistent)return popupValid(s,m)&&s.now>=m.popupStart;
+  return officialPopupAvailable(s,m)&&popupValid(s,m)&&s.now>=m.popupStart&&s.now<m.popupEnd;
+ });
  // One official popup per launch comes first; then continue all personal reminders.
- const m=candidates.filter(m=>m.popupPersistent?(launch.personalCloses||0)<2:!launch.officialChecked).sort(compareNotifications)[0];
+ const m=candidates.filter(m=>m.popupPersistent?(launch.personalCloses||0)<2:!launch.officialChecked).sort(comparePopups)[0];
  if(m&&!m.popupPersistent)launch.officialChecked=true;
  if(m){
   launch.shown=m.id;launch.specialChain=!!m.popupPersistent;m.popupState='shown';m.popupDevice=launch.device;if(m.popupKind==='first_follow')s.firstFollow.locked=true;
   // 个人成果展示即结束该条提醒：停止尚未发送的Push，其他设备与本次启动之后都不再展示。
   if(m.popupPersistent){stopReminder(s,m);m.popupState='shown';m.popupDevice=launch.device;}
+  // 官方通知：记录本次展示，并停止该条尚未发送的Push；是否再次展示由次数与人群决定。
+  else{recordPopupShown(s,m);s.queue=s.queue.filter(id=>!m.events.includes(id));}
  }
  return m||null;
 }
-export function closePopup(s,id,launch){const m=findMessage(s,id);if(!m||m.popupState==='completed')return;if(launch&&m.popupPersistent)launch.personalCloses=(launch.personalCloses||0)+1;stopReminder(s,m);}
+export function closePopup(s,id,launch){
+ const m=findMessage(s,id);if(!m||m.popupState==='completed')return;
+ if(m.popupPersistent){if(launch)launch.personalCloses=(launch.personalCloses||0)+1;stopReminder(s,m);return;}
+ // 官方通知：关闭只结束本次展示，是否再次展示按展示次数与覆盖标签判断。
+ s.queue=s.queue.filter(id=>!m.events.includes(id));
+ m.popupState='pending';
+}
 export function enterHome(launch){launch.personalCloses=0;}
 function stopReminder(s,m){m.reminderStopped=true;completeReminder(s,m);details(s,m).forEach(e=>e.handled=true);s.queue=s.queue.filter(id=>!m.events.includes(id));}
 export function resubmit(s,objectId){for(const m of s.messages)if(m.type==='review'&&m.object.id===objectId){m.reviewStatus='reviewing';stopReminder(s,m);}}
@@ -246,6 +287,10 @@ export function invalidateFeedback(s,eventId){const e=s.events.find(e=>e.id===ev
 export function cancelInteraction(s,eventId){const e=s.events.find(x=>x.id===eventId);if(!e)return;e.cancelled=true;invalidateFeedback(s,eventId);}
 function reconcileReminders(s){for(const m of s.messages){
  if(m.deleted||m.offline||!m.targetAvailable||(official(m)&&s.now>=(m.deliveryExpiresAt??Infinity)))stopReminder(s,m);
+ else if(official(m)&&m.popup){
+  // 不再命中覆盖标签：保留站内消息，停止未发Push；弹窗由实时判断拦截，回到标签后可再次判断。
+  if(!popupAudienceMatch(s,m))s.queue=s.queue.filter(id=>!m.events.includes(id));
+ }
  for(const e of details(s,m))if(e.work?.available===false)invalidateFeedback(s,e.id);
 }}
 export function openNotification(s,id,{success=true,source='notification'}={}){

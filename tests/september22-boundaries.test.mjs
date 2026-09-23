@@ -40,12 +40,27 @@ test('successful resubmission stops previous rejection only; another rejection c
  const fresh=add(s,'review');M.advance(s,M.MINUTE);assert.equal(s.pushes.at(-1).messageId,fresh.id);
 });
 test('read-all, popup close, actual reading and delete each stop pending Push without resetting count',()=>{
- for(const action of ['readAll','closePopup','view','remove'])for(const type of ['activity','honor','follow_build']){
+ for(const action of ['readAll','closePopup','view','remove'])for(const type of ['honor','follow_build']){
   const s=M.createState();s.ordinaryRound={start:s.now,used:1};const m=type==='follow_build'?build(s,'first'):add(s,type,{push:true,popup:true});
   if(action==='readAll')M.readAll(s,'all');else M[action](s,m.id);s.mode='background';M.advance(s,M.MINUTE);
   assert.equal(s.pushes.length,0,action+type);assert.equal(M.round(s).used,1);assert.equal(M.homePopup(s,{device:'B'}),null);
   if(action==='closePopup')assert.equal(M.unread(m),true);
  }
+});
+test('official popup: showing stops its pending Push, and a one-shot notice never shows again',()=>{
+ for(const action of ['readAll','view','remove']){
+  const s=M.createState();s.ordinaryRound={start:s.now,used:1};const m=add(s,'activity',{push:true,popup:true});
+  if(action==='readAll')M.readAll(s,'all');else M[action](s,m.id);s.mode='background';M.advance(s,M.MINUTE);
+  assert.equal(s.pushes.length,0,action);assert.equal(M.round(s).used,1);assert.equal(M.homePopup(s,{device:'B'}),null);
+ }
+ const s=M.createState(),launch={device:'A'},m=add(s,'activity',{push:true,popup:true});
+ assert.equal(M.homePopup(s,launch).id,m.id);
+ assert.equal(m.popupState,'shown');
+ assert.equal(M.homePopup(s,launch),null);
+ assert.equal(s.queue.length,0);
+ M.suspendPopup(s,launch);
+ assert.equal(M.homePopup(s,{device:'B'}),null);
+ assert.equal(M.unread(m),true);
 });
 test('personal spacing is independent and Push click cannot reset either interval',()=>{
  const s=bg();add(s,'honor');add(s,'like');add(s,'growth_star');const first=build(s,'first');assert.equal(s.pushes.length,2);
