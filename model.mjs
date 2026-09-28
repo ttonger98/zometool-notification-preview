@@ -267,7 +267,13 @@ export function homePopup(s,launch){
   // 个人成果展示即结束该条提醒：停止尚未发送的Push，其他设备与本次启动之后都不再展示。
   if(m.popupPersistent){stopReminder(s,m);m.popupState='shown';m.popupDevice=launch.device;}
   // 官方通知：记录本次展示，并停止该条尚未发送的Push；是否再次展示由次数与人群决定。
-  else{recordPopupShown(s,m);s.queue=s.queue.filter(id=>!m.events.includes(id));}
+  else{
+   recordPopupShown(s,m);
+   // Showing the popup consumes pending Push eligibility, including the next
+   // morning's event-based backlog. Keep the message unread and popup repeatable.
+   details(s,m).forEach(e=>{e.handled=true;});
+   s.queue=s.queue.filter(id=>!m.events.includes(id));
+  }
  }
  return m||null;
 }
